@@ -1,0 +1,21 @@
+name: Site
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Derle ve kontrol et
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Derle
+        run: node build.mjs
+      - name: Kontrol et
+        run: node scripts/check.mjs

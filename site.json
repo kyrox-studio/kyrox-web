@@ -1,0 +1,30 @@
+{
+  "url": "https://kyrox.studio",
+  "ad": "Kyrox Studio",
+  "anasayfa": "koyu",
+  "baslik": "Kyrox Studio — Fikirden Üretime",
+  "aciklama": "Tasarlıyoruz. Kodluyoruz. Üretiyoruz. Yazılım, 3D baskı, CNC ve el işçiliği; Ümraniye / İstanbul.",
+  "uzunAciklama": "Kyrox Studio, İstanbul Ümraniye'de bir yaratıcı üretim atölyesidir. Yazılım geliştirir, 3D baskı ile parça ve kutu harf üretir, ahşap işler ve CNC kesimi yapar. Fuar ve stand firmaları için Fuar CRM ve Fuar Stand yazılımlarını geliştirmiştir.",
+  "slogan": "Precision meets Craft.",
+  "eposta": "hello@kyrox.studio",
+  "telefon": "+905469350935",
+  "telefonGorunen": "0546 935 0 935",
+  "whatsapp": "905469350935",
+  "adres": {
+    "sokak": "Altınşehir Mh. Şenel Cad. No:7A",
+    "ilce": "Ümraniye",
+    "il": "İstanbul",
+    "ulke": "TR"
+  },
+  "hizmetler": [
+    { "ad": "Yazılım", "aciklama": "İş akışına özel web uygulamaları, CRM ve araçlar." },
+    { "ad": "3D baskı", "aciklama": "Prototip, maket, yedek parça, kalıp, kutu harf ve logo üretimi." },
+    { "ad": "CNC ve ahşap", "aciklama": "Ahşap ve panel kesimi, ahşap alet ve parça üretimi." },
+    { "ad": "El işçiliği", "aciklama": "Montaj, yüzey işleme ve bitirme." }
+  ],
+  "urunler": [
+    { "ad": "Fuar CRM", "url": "https://fuar.kyrox.studio", "aciklama": "Fuar, firma, görüşme ve teklif süreçlerini tek yerde toplayan CRM." },
+    { "ad": "Fuar Stand", "url": "https://fuar.kyrox.studio", "aciklama": "Gerçek modüllerle 3D stand tasarımı ve malzeme listesi çıkaran konfigüratör." }
+  ],
+  "sosyal": []
+}
