@@ -17,7 +17,7 @@ NGINX_LINK="/etc/nginx/sites-enabled/kyrox-studio"
 NGINX_PROXY="/etc/nginx/kyrox-web-proxy.conf"
 PORT=8090
 PROMPT_INPUT="${PROMPT_INPUT:-/dev/tty}"
-TOTAL_STEPS=7
+TOTAL_STEPS=8
 
 log() { echo "[kurulum] $*"; }
 die() { echo "[kurulum] HATA: $*" >&2; exit 1; }
@@ -53,7 +53,7 @@ ask_yes_no() {
 compose() { docker compose --project-directory "$SUNUCU_DIR" -f "${SUNUCU_DIR}/docker-compose.yml" "$@"; }
 wp() { compose run --rm -T cli wp "$@"; }
 
-env_get() { grep -E "^$1=" "$ENV_FILE" 2>/dev/null | head -1 | cut -d= -f2-; }
+env_get() { { grep -E "^$1=" "$ENV_FILE" 2>/dev/null || true; } | head -1 | cut -d= -f2-; }
 env_set() {
   if grep -qE "^$1=" "$ENV_FILE"; then
     sed -i "s#^$1=.*#$1=$2#" "$ENV_FILE"
@@ -62,6 +62,53 @@ env_set() {
   fi
 }
 gizli() { openssl rand -base64 48 | tr -d '\n/+=' | cut -c1-64; }
+
+# SMTP bilgilerini sorar ve .env'e yazar; WordPress kapsayıcısı yeni ayarlarla yeniden başlar.
+smtp_sor() {
+  local host port kullanici sifre sifre2 gecici
+  host="$(env_get SMTP_HOST)"; port="$(env_get SMTP_PORT)"; kullanici="$(env_get SMTP_USER)"
+  host="$(ask "SMTP sunucusu" "${host:-mail.kurumsaleposta.com}")"
+  [[ "$host" =~ ^[a-zA-Z0-9.-]+$ ]] || die "Geçersiz SMTP sunucusu: ${host}"
+  port="$(ask "SMTP portu (465 SSL, 587 STARTTLS)" "${port:-465}")"
+  [[ "$port" =~ ^[0-9]+$ ]] || die "Geçersiz port: ${port}"
+  kullanici="$(ask "SMTP kullanıcısı (gönderen e-posta adresi)" "${kullanici:-$EPOSTA}")"
+  [[ "$kullanici" =~ ^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$ ]] || die "Geçersiz e-posta: ${kullanici}"
+  echo "  ${kullanici} hesabının e-posta şifresini girin (ekranda görünmez)."
+  while true; do
+    read -r -s -p "  Şifre: " sifre < "$PROMPT_INPUT"; echo
+    read -r -s -p "  Şifre (tekrar): " sifre2 < "$PROMPT_INPUT"; echo
+    if [[ "$sifre" != "$sifre2" ]]; then echo "  Şifreler aynı değil, tekrar deneyin."; continue; fi
+    if [[ -z "$sifre" ]]; then echo "  Şifre boş olamaz."; continue; fi
+    if [[ "$sifre" == *"'"* ]]; then echo "  Şifrede tek tırnak (') olamaz; posta panelinden şifreyi değiştirip tekrar deneyin."; continue; fi
+    break
+  done
+  env_set SMTP_HOST "$host"
+  env_set SMTP_PORT "$port"
+  env_set SMTP_USER "$kullanici"
+  env_set SMTP_FROM "$kullanici"
+  # Şifre sed'e verilmez (özel karakterler bozabilir); satır silinip tek tırnakla eklenir.
+  gecici="$(mktemp "${ENV_FILE}.XXXX")"
+  grep -vE '^SMTP_PASSWORD=' "$ENV_FILE" > "$gecici" || true
+  printf "SMTP_PASSWORD='%s'\n" "$sifre" >> "$gecici"
+  chmod 600 "$gecici"
+  mv "$gecici" "$ENV_FILE"
+  unset sifre sifre2
+  compose up -d wordpress
+  log "SMTP ayarları kaydedildi; WordPress yeni ayarlarla yeniden başladı."
+}
+
+# Formun alıcısına deneme e-postası gönderir; hata olursa sebebini yazar, kurulumu durdurmaz.
+smtp_dene() {
+  local cikti
+  cikti="$(wp eval 'echo wp_mail( kyrox_ayar( "eposta" ), get_bloginfo( "name" ) . " — deneme", "kur.sh deneme e-postası. Bu iletiyi aldıysanız iş fişi formu e-posta gönderebiliyor." ) ? "TAMAM " . kyrox_ayar( "eposta" ) : "HATA";' 2>&1 || true)"
+  if [[ "$cikti" == *TAMAM* ]]; then
+    log "Deneme e-postası gönderildi: ${cikti##*TAMAM }. Gelen kutusunu (ve gereksiz klasörünü) kontrol edin."
+  else
+    log "UYARI: Deneme e-postası gönderilemedi. Sebep:"
+    grep -E 'kyrox:|Error|HATA' <<< "$cikti" | sed 's/^/    /' || echo "    ${cikti}"
+    log "Şifreyi ve sunucu/port bilgisini kontrol edip sihirbazı tekrar çalıştırın. Talepler panelde saklanmaya devam eder."
+  fi
+}
 
 # GitHub'daki yeni değişiklikleri sorarak çeker (yalnız ileri sarma; yerel değişiklik
 # varsa dokunmaz). kur.sh'nin kendisi değiştiyse yeni sürümle baştan başlar.
@@ -204,7 +251,23 @@ fi
 wp rewrite flush >/dev/null
 
 # ─────────────────────────────────────────────────────────────
-step_title 6 "nginx (${ALAN} ve www.${ALAN})"
+step_title 6 "İletişim formu e-postası (SMTP)"
+echo "  İş fişi formundan gelen talepler panelde (Gelen talepler) saklanır; SMTP ayarlanırsa"
+echo "  her talep ayrıca e-postayla bildirilir."
+if [[ -n "$(env_get SMTP_USER)" ]]; then
+  log "E-posta gönderimi ayarlı: $(env_get SMTP_USER) → $(env_get SMTP_HOST):$(env_get SMTP_PORT)"
+  if ask_yes_no "SMTP ayarları değiştirilsin mi?" "H"; then smtp_sor; fi
+elif ask_yes_no "Talepler e-postayla da bildirilsin mi?" "E"; then
+  smtp_sor
+else
+  log "Atlandı; talepler yalnız panelde saklanır."
+fi
+if [[ -n "$(env_get SMTP_USER)" ]] && ask_yes_no "Deneme e-postası gönderilsin mi?" "E"; then
+  smtp_dene
+fi
+
+# ─────────────────────────────────────────────────────────────
+step_title 7 "nginx (${ALAN} ve www.${ALAN})"
 sed "s/__PORT__/${PORT}/g" "${SUNUCU_DIR}/nginx-proxy.conf" > "$NGINX_PROXY"
 if [[ -f "$NGINX_SITE" ]]; then
   log "${NGINX_SITE} zaten var; üzerine yazılmadı (certbot'un eklediği HTTPS ayarları korunur)."
@@ -221,7 +284,7 @@ systemctl reload nginx
 log "nginx yeniden yüklendi."
 
 # ─────────────────────────────────────────────────────────────
-step_title 7 "SSL (Let's Encrypt)"
+step_title 8 "SSL (Let's Encrypt)"
 if [[ -f "$SERTIFIKA" ]]; then
   log "Sertifika zaten var: ${SERTIFIKA}"
 else

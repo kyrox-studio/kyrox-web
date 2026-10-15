@@ -97,8 +97,9 @@ Bağlanırken `ssh -t` kullanın; sihirbaz soru sorar. Her soruda köşeli paran
 | 3. Ayar dosyası | `sunucu/.env` yoksa rastgele veritabanı şifreleri ve WordPress anahtarlarıyla oluşturulur | — |
 | 4. Kapsayıcılar | WordPress + MariaDB başlar, yalnız `127.0.0.1:8090` | — |
 | 5. Yönetici hesabı | Site adı, kullanıcı adı (`admin` olamaz), **şifre** (en az 12 karakter, ekranda görünmez, iki kez) | Enter, Enter, şifre |
-| 6. nginx | `kyrox.studio` ve `www` için site; `www` çıplak alan adına yönlenir; giriş sayfasına hız sınırı; XML-RPC kapalı | — |
-| 7. SSL | DNS sunucuyu gösteriyorsa Let's Encrypt kullanım koşullarını kabul edip etmediğinizi sorar; kabul ederseniz sertifika alınır ve site `https`'e geçer | `e` |
+| 6. Form e-postası | İş fişi formundan gelen talepler e-postayla da bildirilsin mi; evet derseniz SMTP sunucusu (`mail.kurumsaleposta.com`), port (`465`), kullanıcı ve **e-posta şifresi** (ekranda görünmez); sonunda deneme e-postası | `e`, Enter, Enter, Enter, şifre, `e` |
+| 7. nginx | `kyrox.studio` ve `www` için site; `www` çıplak alan adına yönlenir; giriş sayfasına hız sınırı; XML-RPC kapalı | — |
+| 8. SSL | DNS sunucuyu gösteriyorsa Let's Encrypt kullanım koşullarını kabul edip etmediğinizi sorar; kabul ederseniz sertifika alınır ve site `https`'e geçer | `e` |
 
 Sihirbaz tekrar çalıştırılabilir: kurulu WordPress'e, yönetici hesabına, yazılmış nginx sitesine ve alınmış sertifikaya dokunmaz. DNS sonradan yayıldıysa tekrar çalıştırmak yalnız SSL'i ekler.
 
@@ -115,5 +116,7 @@ Mevcut nginx siteleri değişmez; yeni site `/etc/nginx/sites-available/kyrox-st
 ```bash
 sudo bash /opt/kyrox/kyrox-fair-crm/scripts/server/backup/install-backup.sh
 ```
+
+**İletişim formu:** Ana sayfadaki iş fişi "Gönder"e basılınca talebi arka planda sunucuya yollar (`/wp-json/kyrox/v1/talep`). Sunucu talebi panelde **Gelen talepler** altına kaydeder ve SMTP ayarlıysa Görünüm > Özelleştir > İletişim bilgileri'ndeki e-posta adresine bildirir. E-posta gitmese bile talep panelde kalır; listede "E-posta" sütunu gönderilip gönderilmediğini, gönderilemediyse sebebini gösterir. Bot koruması: görünmez tuzak alan ve aynı IP'den 10 dakikada en fazla 5 talep.
 
 `.env` repoya girmez; içindeki şifreler yalnız sunucuda durur.

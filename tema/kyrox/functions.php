@@ -9,11 +9,12 @@
  * inc/seo.php        meta, Open Graph, JSON-LD, robots.txt, llms.txt, site haritası
  * inc/guvenlik.php   XML-RPC, kullanıcı numaralandırma, yorumlar
  * inc/kurulum.php    tema etkinleşince sayfalar, kalıcı bağlantılar ve başlangıç içeriği
+ * inc/form.php       iş fişi formu: talebi kaydeder, SMTP ile e-postayla bildirir
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'KYROX_SURUM', '1.0.0' );
+define( 'KYROX_SURUM', '1.1.0' );
 define( 'KYROX_DIZIN', __DIR__ );
 
 require_once KYROX_DIZIN . '/inc/yardimci.php';
@@ -23,6 +24,7 @@ require_once KYROX_DIZIN . '/inc/isler.php';
 require_once KYROX_DIZIN . '/inc/seo.php';
 require_once KYROX_DIZIN . '/inc/guvenlik.php';
 require_once KYROX_DIZIN . '/inc/kurulum.php';
+require_once KYROX_DIZIN . '/inc/form.php';
 
 add_action(
 	'after_setup_theme',
