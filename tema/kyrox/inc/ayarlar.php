@@ -87,7 +87,13 @@ function kyrox_varsayilanlar(): array {
 		'seo_baslik'        => 'Kyrox Studio — Fikirden Üretime',
 		'seo_aciklama'      => 'Tasarlıyoruz. Kodluyoruz. Üretiyoruz. Yazılım, 3D baskı, CNC ve el işçiliği; Ümraniye / İstanbul.',
 		'kurum_aciklama'    => "Kyrox Studio, İstanbul Ümraniye'de bir yaratıcı üretim atölyesidir. Yazılım geliştirir, 3D baskı ile parça ve kutu harf üretir, ahşap işler ve CNC kesimi yapar. Fuar ve stand firmaları için Fuar CRM ve Fuar Stand yazılımlarını geliştirmiştir.",
-		'sosyal'            => "https://www.linkedin.com/company/kyrox-studio/\nhttps://www.instagram.com/kyrox.studio",
+		'sosyal'            => "https://www.instagram.com/kyrox.studio\nhttps://www.linkedin.com/company/kyrox-studio/",
+
+		// Takip bandı (her sayfada alt bilginin üstünde)
+		'takip_ust'         => 'Atölyeden canlı',
+		'takip_baslik'      => "TEZGÂHTA NE VAR?\nTAKİPTE KALIN.",
+		'takip_instagram'   => 'Üretimden kareler, 3D baskı ve ahşap süreçleri, kısa videolar.',
+		'takip_linkedin'    => 'Projeler, yazılım çalışmaları ve stüdyo haberleri.',
 	);
 	return $v;
 }
@@ -144,6 +150,34 @@ function kyrox_sosyal_baglantilar(): array {
 	return $baglantilar;
 }
 
+/** Takip bandı kartları: ad, görünen hesap adı ve kısa açıklama. */
+function kyrox_sosyal_hesaplar(): array {
+	// "Instagram'da", "LinkedIn'de": bulunma eki ünlü uyumuna göre.
+	$ekler    = array(
+		'Instagram' => 'da',
+		'LinkedIn'  => 'de',
+		'X'         => 'te',
+		'YouTube'   => 'da',
+		'Facebook'  => 'ta',
+		'GitHub'    => 'da',
+		'Behance'   => 'te',
+	);
+	$hesaplar = array();
+	foreach ( kyrox_sosyal_baglantilar() as $adres => $ad ) {
+		$yol        = trim( (string) wp_parse_url( $adres, PHP_URL_PATH ), '/' );
+		$hesap      = 'Instagram' === $ad && '' !== $yol ? '@' . strtok( $yol, '/' ) : get_bloginfo( 'name' );
+		$anahtar    = 'takip_' . strtolower( $ad );
+		$hesaplar[] = array(
+			'adres' => $adres,
+			'ad'    => $ad,
+			'hesap' => $hesap,
+			'metin' => isset( kyrox_varsayilanlar()[ $anahtar ] ) ? kyrox_ayar( $anahtar ) : '',
+			'dugme' => isset( $ekler[ $ad ] ) ? $ad . "'" . $ekler[ $ad ] . ' takip et' : 'Takip et',
+		);
+	}
+	return $hesaplar;
+}
+
 add_action(
 	'customize_register',
 	function ( WP_Customize_Manager $wp_customize ) {
@@ -189,6 +223,7 @@ add_action(
 			'kyrox_blog'     => 'Blog bölümü',
 			'kyrox_fis'      => 'İş fişi',
 			'kyrox_iletisim' => 'İletişim bilgileri',
+			'kyrox_takip'    => 'Takip bandı (sosyal medya)',
 			'kyrox_seo'      => 'Arama motorları ve yapay zekâ',
 		);
 		$sira = 10;
@@ -313,7 +348,16 @@ add_action(
 				'adres_il'        => 'Adres: il',
 				'harita'          => 'Harita için adres (Google Haritalar araması; kısaltmasız yazın)',
 				'footer_slogan'   => 'Alt bilgi sloganı',
-				'sosyal'          => array( 'Sosyal medya adresleri (her satıra bir adres; alt bilgide ve iletişim kutusunda görünür)', 'textarea' ),
+				'sosyal'          => array( 'Sosyal medya adresleri (her satıra bir adres; üst menüde, takip bandında, alt bilgide ve iletişim kutusunda görünür)', 'textarea' ),
+			)
+		);
+		$ekle(
+			'kyrox_takip',
+			array(
+				'takip_ust'       => 'Üst etiket',
+				'takip_baslik'    => array( 'Başlık (2. satır turuncu)', 'textarea' ),
+				'takip_instagram' => array( 'Instagram kartı: açıklama', 'textarea' ),
+				'takip_linkedin'  => array( 'LinkedIn kartı: açıklama', 'textarea' ),
 			)
 		);
 		$ekle(
