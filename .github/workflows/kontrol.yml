@@ -21,6 +21,22 @@ jobs:
           sed -i 's/=$/=ci/' .env
           docker compose --profile araclar config --quiet
 
+  sunucu:
+    name: Sunucu kurulumu (kur.sh ve nginx şablonu)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: docker run --rm -v "$PWD/sunucu:/s:ro" koalaman/shellcheck:stable -S warning /s/kur.sh
+      - name: nginx -t (Ubuntu 24.04 ile aynı sürüm)
+        run: |
+          mkdir -p /tmp/ng/sites-enabled
+          printf 'events {}\nhttp { include /etc/nginx/sites-enabled/*; }\n' > /tmp/ng/nginx.conf
+          sed -e 's/__ALAN__/kyrox.studio/g' -e 's/__PORT__/8090/g' sunucu/nginx-site.conf > /tmp/ng/sites-enabled/kyrox-studio
+          sed -e 's/__PORT__/8090/g' sunucu/nginx-proxy.conf > /tmp/ng/kyrox-web-proxy.conf
+          docker run --rm -v /tmp/ng/nginx.conf:/etc/nginx/nginx.conf:ro -v /tmp/ng/sites-enabled:/etc/nginx/sites-enabled:ro -v /tmp/ng/kyrox-web-proxy.conf:/etc/nginx/kyrox-web-proxy.conf:ro nginx:1.24-alpine nginx -t
+
   tasarim:
     name: Statik tasarım (derle ve kontrol et)
     runs-on: ubuntu-latest
