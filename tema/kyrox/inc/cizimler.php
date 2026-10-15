@@ -53,6 +53,16 @@ function kyrox_akis_ikonu( int $sira ): string {
 	return $ikonlar[ $sira ] ?? '';
 }
 
+/** Sosyal medya ikonu (çizgi; renk currentColor). Bilinmeyen ağ için dış bağlantı oku. */
+function kyrox_sosyal_ikonu( string $ad, int $boyut = 18 ): string {
+	$yollar = array(
+		'Instagram' => '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/>',
+		'LinkedIn'  => '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10.5v6"/><circle cx="8" cy="7.5" r=".6" fill="currentColor"/><path d="M12 16.5v-6m0 2.5a2.5 2.5 0 0 1 5 0v3.5"/>',
+	);
+	$yol = $yollar[ $ad ] ?? '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>';
+	return '<svg viewBox="0 0 24 24" width="' . $boyut . '" height="' . $boyut . '" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $yol . '</svg>';
+}
+
 /** Sağ alttaki WhatsApp düğmesinin ikonu. */
 function kyrox_whatsapp_ikonu(): string {
 	return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 1.8 1.7 3.7 3.6 4.6l1.2-1.2 1.8.8-.4 1.6c-3.3.2-6.6-3.2-6.4-6.5l1.6-.4.8 1.8z"/></svg>';
