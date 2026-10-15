@@ -123,8 +123,17 @@ if wp core is-installed >/dev/null 2>&1; then
   log "WordPress zaten kurulu; yönetici hesabına dokunulmadı."
 else
   BASLIK="$(ask "Site adı" "Kyrox Studio")"
-  KULLANICI="$(ask "Yönetici kullanıcı adı (admin olmasın)" "kyrox")"
-  [[ "$KULLANICI" =~ ^[a-zA-Z0-9._-]{3,}$ && "${KULLANICI,,}" != "admin" ]] || die "Kullanıcı adı en az 3 karakter olmalı ve 'admin' olmamalı"
+  while true; do
+    KULLANICI="$(ask "Yönetici kullanıcı adı (admin olmasın)" "kyrox")"
+    if [[ ! "$KULLANICI" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+      echo "  Kullanıcı adında yalnız harf, rakam, nokta, alt çizgi ve tire olabilir; @ ve boşluk olmaz."
+      echo "  (E-posta adresi değil; girişte kullanıcı adı yerine e-postayı da yazabilirsiniz.)"
+      continue
+    fi
+    if (( ${#KULLANICI} < 3 )); then echo "  Kullanıcı adı en az 3 karakter olmalı."; continue; fi
+    if [[ "${KULLANICI,,}" == "admin" ]]; then echo "  'admin' tahmin edilmesi kolay; başka bir ad seçin."; continue; fi
+    break
+  done
   echo "  Yönetici şifresini girin (en az 12 karakter; ekranda görünmez)."
   while true; do
     read -r -s -p "  Şifre: " SIFRE < "$PROMPT_INPUT"; echo
