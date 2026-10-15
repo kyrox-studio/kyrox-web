@@ -1,7 +1,7 @@
 <?php
 /**
  * Tema ilk etkinleştiğinde: Ana sayfa ve Blog sayfaları, kalıcı bağlantılar,
- * Türkçe tarih/saat ayarları, örnek yazı ve iş kartları. Bir kez çalışır; var olan
+ * Türkçe tarih/saat ayarları, "Atölye notları" kategorisi, örnek yazı ve iş kartları. Bir kez çalışır; var olan
  * içeriğe dokunmaz. Elle tekrar çalıştırmak: wp eval 'kyrox_kur();'
  */
 
@@ -16,6 +16,20 @@ add_action(
 			kyrox_kur();
 		}
 		flush_rewrite_rules();
+	}
+);
+
+// Eski kategori adresi (Uncategorized) yeni adrese kalıcı yönlenir; arama motorlarındaki eski bağlantı boşa düşmez.
+add_action(
+	'template_redirect',
+	function () {
+		if ( is_404() && 'uncategorized' === get_query_var( 'category_name' ) ) {
+			$kategori = get_term( (int) get_option( 'default_category' ), 'category' );
+			if ( $kategori instanceof WP_Term ) {
+				wp_safe_redirect( get_term_link( $kategori ), 301 );
+				exit;
+			}
+		}
 	}
 );
 
@@ -69,6 +83,20 @@ function kyrox_kur(): void {
 	$ornek = get_page_by_path( 'sample-page' );
 	if ( $ornek && $ornek->post_modified === $ornek->post_date ) {
 		wp_delete_post( $ornek->ID, true );
+	}
+
+	// Varsayılan kategori İngilizce "Uncategorized" kalmasın.
+	$kategori = get_term( (int) get_option( 'default_category' ), 'category' );
+	if ( $kategori instanceof WP_Term && 'uncategorized' === $kategori->slug ) {
+		wp_update_term(
+			$kategori->term_id,
+			'category',
+			array(
+				'name'        => 'Atölye notları',
+				'slug'        => 'atolye-notlari',
+				'description' => 'Yazılım, 3D baskı, ahşap ve üretim üzerine denediklerimiz ve öğrendiklerimiz.',
+			)
+		);
 	}
 
 	kyrox_ornek_yazi();
