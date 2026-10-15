@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'KYROX_SURUM', '1.1.0' );
+define( 'KYROX_SURUM', '1.1.1' );
 define( 'KYROX_DIZIN', __DIR__ );
 
 require_once KYROX_DIZIN . '/inc/yardimci.php';
