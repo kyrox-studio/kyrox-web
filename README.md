@@ -79,6 +79,35 @@ Yerelde PHP denetimi için:
 docker run --rm -v "$PWD/tema:/t:ro" php:8.4-cli sh /t/lint.sh /t/kyrox
 ```
 
-## Sunucu
+## Sunucuya kurulum
 
-Sunucuda WordPress ve MariaDB yalnız `127.0.0.1:8090`'a açılır; `kyrox.studio` için nginx bloğu, SSL ve yedeğe ekleme ayrı bir adımda kurulur. `.env` repoya girmez.
+Repo sunucuda Kyrox projelerinin yanında durur: `/opt/kyrox/kyrox-web`.
+
+```bash
+sudo git clone https://github.com/kyrox-studio/kyrox-web.git /opt/kyrox/kyrox-web
+sudo bash /opt/kyrox/kyrox-web/sunucu/kur.sh
+```
+
+Bağlanırken `ssh -t` kullanın; sihirbaz soru sorar. Her soruda köşeli parantezdeki değer varsayılandır, kabul etmek için Enter'a basın.
+
+| Adım | Ne olur | Ne yazarsınız |
+|---|---|---|
+| 1. Ön kontroller | docker, nginx, bellek, 8090 portu | — |
+| 2. Alan adı ve e-posta | `[kyrox.studio]`, `[hello@kyrox.studio]` | Enter, Enter |
+| 3. Ayar dosyası | `sunucu/.env` yoksa rastgele veritabanı şifreleri ve WordPress anahtarlarıyla oluşturulur | — |
+| 4. Kapsayıcılar | WordPress + MariaDB başlar, yalnız `127.0.0.1:8090` | — |
+| 5. Yönetici hesabı | Site adı, kullanıcı adı (`admin` olamaz), **şifre** (en az 12 karakter, ekranda görünmez, iki kez) | Enter, Enter, şifre |
+| 6. nginx | `kyrox.studio` ve `www` için site; `www` çıplak alan adına yönlenir; giriş sayfasına hız sınırı; XML-RPC kapalı | — |
+| 7. SSL | DNS sunucuyu gösteriyorsa Let's Encrypt kullanım koşullarını kabul edip etmediğinizi sorar; kabul ederseniz sertifika alınır ve site `https`'e geçer | `e` |
+
+Sihirbaz tekrar çalıştırılabilir: kurulu WordPress'e, yönetici hesabına, yazılmış nginx sitesine ve alınmış sertifikaya dokunmaz. DNS sonradan yayıldıysa tekrar çalıştırmak yalnız SSL'i ekler.
+
+Mevcut nginx siteleri değişmez; yeni site `/etc/nginx/sites-available/kyrox-studio` dosyasıdır ve `nginx -t` geçmezse nginx yeniden yüklenmez.
+
+**Yedek:** WordPress veritabanı ve dosyaları gece yedeğine, yedek sihirbazı tekrar çalıştırılınca eklenir (sihirbaz MariaDB kapsayıcısını ve WordPress dosyalarını kendisi bulur):
+
+```bash
+sudo bash /opt/kyrox/kyrox-fair-crm/scripts/server/backup/install-backup.sh
+```
+
+`.env` repoya girmez; içindeki şifreler yalnız sunucuda durur.
