@@ -117,6 +117,6 @@ Mevcut nginx siteleri değişmez; yeni site `/etc/nginx/sites-available/kyrox-st
 sudo bash /opt/kyrox/kyrox-fair-crm/scripts/server/backup/install-backup.sh
 ```
 
-**İletişim formu:** Ana sayfadaki iş fişi "Gönder"e basılınca talebi arka planda sunucuya yollar (`/wp-json/kyrox/v1/talep`). Sunucu talebi panelde **Gelen talepler** altına kaydeder ve SMTP ayarlıysa Görünüm > Özelleştir > İletişim bilgileri'ndeki e-posta adresine bildirir. E-posta gitmese bile talep panelde kalır; listede "E-posta" sütunu gönderilip gönderilmediğini gösterir. Gönderilemeyen e-postanın sebebi `docker logs kyrox-web` çıktısında `kyrox: e-posta gönderilemedi` satırındadır. Bot koruması: görünmez tuzak alan ve aynı IP'den 10 dakikada en fazla 5 talep.
+**İletişim formu:** Ana sayfadaki iş fişi "Gönder"e basılınca talebi arka planda sunucuya yollar (`/wp-json/kyrox/v1/talep`). Sunucu talebi panelde **Gelen talepler** altına kaydeder ve SMTP ayarlıysa Görünüm > Özelleştir > İletişim bilgileri'ndeki e-posta adresine bildirir. E-posta gitmese bile talep panelde kalır; listede "E-posta" sütunu gönderilip gönderilmediğini, gönderilemediyse sebebini gösterir. Bot koruması: görünmez tuzak alan ve aynı IP'den 10 dakikada en fazla 5 talep.
 
 `.env` repoya girmez; içindeki şifreler yalnız sunucuda durur.

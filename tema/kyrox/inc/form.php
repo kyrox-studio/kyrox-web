@@ -115,8 +115,12 @@ function kyrox_talep_al( WP_REST_Request $istek ) {
 	if ( is_email( $iletisim ) ) {
 		$basliklar[] = 'Reply-To: ' . $iletisim;
 	}
+	$GLOBALS['kyrox_eposta_hatasi'] = '';
 	$gitti = wp_mail( kyrox_ayar( 'eposta' ), $ad . ' — Yeni iş talebi', $govde, $basliklar );
 	update_post_meta( $kayit, '_kyrox_eposta', $gitti ? 'gonderildi' : 'gonderilemedi' );
+	if ( ! $gitti ) {
+		update_post_meta( $kayit, '_kyrox_eposta_hatasi', $GLOBALS['kyrox_eposta_hatasi'] ?: ( getenv( 'SMTP_HOST' ) ? 'bilinmiyor' : 'SMTP ayarlı değil' ) );
+	}
 
 	return array( 'ok' => true );
 }
@@ -151,10 +155,11 @@ add_filter(
 );
 add_filter( 'wp_mail_from_name', fn() => get_bloginfo( 'name' ) );
 
-// Gönderilemeyen e-postanın sebebi PHP hata günlüğüne yazılır (docker logs kyrox-web).
+// Gönderilemeyen e-postanın sebebi talebe yazılır (listede görünür) ve PHP hata günlüğüne düşer.
 add_action(
 	'wp_mail_failed',
 	function ( WP_Error $hata ) {
+		$GLOBALS['kyrox_eposta_hatasi'] = $hata->get_error_message();
 		error_log( 'kyrox: e-posta gönderilemedi: ' . $hata->get_error_message() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 	}
 );
@@ -171,7 +176,11 @@ add_action(
 	'manage_kyrox_talep_posts_custom_column',
 	function ( $sutun, $kayit ) {
 		if ( 'kyrox_eposta' === $sutun ) {
-			echo 'gonderildi' === get_post_meta( $kayit, '_kyrox_eposta', true ) ? 'Gönderildi' : 'Gönderilemedi';
+			if ( 'gonderildi' === get_post_meta( $kayit, '_kyrox_eposta', true ) ) {
+				echo 'Gönderildi';
+			} else {
+				echo 'Gönderilemedi<br><small>' . esc_html( (string) get_post_meta( $kayit, '_kyrox_eposta_hatasi', true ) ) . '</small>';
+			}
 		}
 	},
 	10,
