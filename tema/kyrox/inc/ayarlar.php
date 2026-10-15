@@ -87,7 +87,7 @@ function kyrox_varsayilanlar(): array {
 		'seo_baslik'        => 'Kyrox Studio — Fikirden Üretime',
 		'seo_aciklama'      => 'Tasarlıyoruz. Kodluyoruz. Üretiyoruz. Yazılım, 3D baskı, CNC ve el işçiliği; Ümraniye / İstanbul.',
 		'kurum_aciklama'    => "Kyrox Studio, İstanbul Ümraniye'de bir yaratıcı üretim atölyesidir. Yazılım geliştirir, 3D baskı ile parça ve kutu harf üretir, ahşap işler ve CNC kesimi yapar. Fuar ve stand firmaları için Fuar CRM ve Fuar Stand yazılımlarını geliştirmiştir.",
-		'sosyal'            => '',
+		'sosyal'            => "https://www.linkedin.com/company/kyrox-studio/\nhttps://www.instagram.com/kyrox.studio",
 	);
 	return $v;
 }
@@ -122,6 +122,26 @@ function kyrox_harita_adresi(): string {
 function kyrox_sosyal(): array {
 	$satirlar = preg_split( '/\s+/', kyrox_ayar( 'sosyal' ), -1, PREG_SPLIT_NO_EMPTY );
 	return array_values( array_filter( array_map( 'esc_url_raw', $satirlar ) ) );
+}
+
+/** Sitede gösterilecek sosyal medya bağlantıları: adres => görünen ad (LinkedIn, Instagram…). */
+function kyrox_sosyal_baglantilar(): array {
+	$adlar = array(
+		'linkedin.com'  => 'LinkedIn',
+		'instagram.com' => 'Instagram',
+		'x.com'         => 'X',
+		'twitter.com'   => 'X',
+		'youtube.com'   => 'YouTube',
+		'facebook.com'  => 'Facebook',
+		'github.com'    => 'GitHub',
+		'behance.net'   => 'Behance',
+	);
+	$baglantilar = array();
+	foreach ( kyrox_sosyal() as $adres ) {
+		$alan = preg_replace( '/^www\./', '', (string) wp_parse_url( $adres, PHP_URL_HOST ) );
+		$baglantilar[ $adres ] = $adlar[ $alan ] ?? $alan;
+	}
+	return $baglantilar;
 }
 
 add_action(
@@ -293,6 +313,7 @@ add_action(
 				'adres_il'        => 'Adres: il',
 				'harita'          => 'Harita için adres (Google Haritalar araması; kısaltmasız yazın)',
 				'footer_slogan'   => 'Alt bilgi sloganı',
+				'sosyal'          => array( 'Sosyal medya adresleri (her satıra bir adres; alt bilgide ve iletişim kutusunda görünür)', 'textarea' ),
 			)
 		);
 		$ekle(
@@ -301,7 +322,6 @@ add_action(
 				'seo_baslik'     => 'Ana sayfa başlığı (tarayıcı sekmesi ve Google)',
 				'seo_aciklama'   => array( 'Ana sayfa açıklaması (Google ve paylaşım önizlemesi)', 'textarea' ),
 				'kurum_aciklama' => array( 'Kurum tanıtımı (yapay zekâ asistanları ve schema.org)', 'textarea' ),
-				'sosyal'         => array( 'Sosyal medya adresleri (her satıra bir adres)', 'textarea' ),
 			)
 		);
 	}
