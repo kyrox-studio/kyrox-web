@@ -1,0 +1,36 @@
+name: Kontrol
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  tema:
+    name: WordPress teması (PHP sözdizimi)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP 8.4 ile php -l
+        run: docker run --rm -v "$PWD/tema:/t:ro" php:8.4-cli sh /t/lint.sh /t/kyrox
+      - name: Docker Compose dosyası geçerli
+        working-directory: sunucu
+        run: |
+          cp .env.example .env
+          sed -i 's/=$/=ci/' .env
+          docker compose --profile araclar config --quiet
+
+  tasarim:
+    name: Statik tasarım (derle ve kontrol et)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Derle
+        run: node tasarim/build.mjs
+      - name: Kontrol et
+        run: node tasarim/scripts/check.mjs
