@@ -1,4 +1,4 @@
-// Siteyi bilgisayarda önizlemek için: `node serve.mjs` → http://localhost:4321
+// Statik tasarımı bilgisayarda önizlemek için: `node tasarim/serve.mjs` → http://localhost:4321
 // Önce derler, sonra dist/ klasörünü yayınlar. Dosya değiştirince sayfayı yenilemeden önce yeniden çalıştırın.
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';

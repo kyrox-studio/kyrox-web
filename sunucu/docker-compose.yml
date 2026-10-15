@@ -1,0 +1,79 @@
+# kyrox.studio: WordPress + MariaDB.
+# Yerelde ve sunucuda aynı dosya kullanılır; farkları .env belirler (bkz. .env.example).
+# Yalnız 127.0.0.1'e açılır; dışarıya nginx (sunucuda) üzerinden çıkar.
+name: kyrox-web
+
+services:
+  db:
+    image: mariadb:11.8
+    container_name: kyrox-web-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: ${WP_DB_PASSWORD:?WP_DB_PASSWORD .env içinde tanımlı olmalı}
+      MARIADB_ROOT_PASSWORD: ${WP_DB_ROOT_PASSWORD:?WP_DB_ROOT_PASSWORD .env içinde tanımlı olmalı}
+    volumes:
+      - kyrox_web_db:/var/lib/mysql
+      - ./mariadb.cnf:/etc/mysql/conf.d/kyrox.cnf:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:7-php8.4-apache
+    container_name: kyrox-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${WP_PORT:-8090}:80"
+    environment: &wp_env
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${WP_DB_PASSWORD}
+      WORDPRESS_AUTH_KEY: ${WP_AUTH_KEY:?WP_AUTH_KEY .env içinde tanımlı olmalı}
+      WORDPRESS_SECURE_AUTH_KEY: ${WP_SECURE_AUTH_KEY:?}
+      WORDPRESS_LOGGED_IN_KEY: ${WP_LOGGED_IN_KEY:?}
+      WORDPRESS_NONCE_KEY: ${WP_NONCE_KEY:?}
+      WORDPRESS_AUTH_SALT: ${WP_AUTH_SALT:?}
+      WORDPRESS_SECURE_AUTH_SALT: ${WP_SECURE_AUTH_SALT:?}
+      WORDPRESS_LOGGED_IN_SALT: ${WP_LOGGED_IN_SALT:?}
+      WORDPRESS_NONCE_SALT: ${WP_NONCE_SALT:?}
+      WP_HOME: ${WP_HOME:-http://localhost:8090}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME', getenv('WP_HOME'));
+        define('WP_SITEURL', getenv('WP_HOME'));
+        // nginx HTTPS'i sonlandırır; WordPress bunu bilsin.
+        if (($$_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https') { $$_SERVER['HTTPS'] = 'on'; }
+        define('DISALLOW_FILE_EDIT', true);
+        define('WP_POST_REVISIONS', 10);
+        define('WP_MEMORY_LIMIT', '96M');
+    volumes:
+      - kyrox_web_html:/var/www/html
+      - ../tema/kyrox:/var/www/html/wp-content/themes/kyrox:ro
+      - ./php.ini:/usr/local/etc/php/conf.d/kyrox.ini:ro
+      - ./apache-mpm.conf:/etc/apache2/mods-available/mpm_prefork.conf:ro
+
+  # Kurulum ve bakım için: docker compose run --rm cli wp ...
+  cli:
+    image: wordpress:cli-php8.4
+    profiles: ["araclar"]
+    user: "33:33"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: *wp_env
+    volumes:
+      - kyrox_web_html:/var/www/html
+      - ../tema/kyrox:/var/www/html/wp-content/themes/kyrox:ro
+
+volumes:
+  kyrox_web_db:
+    name: kyrox-web-db-data
+  kyrox_web_html:
+    name: kyrox-web-html

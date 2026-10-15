@@ -1,4 +1,4 @@
-// Derlenmiş siteyi kontrol eder: `node build.mjs && node scripts/check.mjs`
+// Derlenmiş statik tasarımı kontrol eder: `node tasarim/build.mjs && node tasarim/scripts/check.mjs`
 // Bozuk iç bağlantı, okunamayan kimlik bilgisi (JSON-LD), doldurulmamış şablon alanı veya eksik dosya varsa hata verir.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
