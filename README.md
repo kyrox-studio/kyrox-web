@@ -92,7 +92,7 @@ Bağlanırken `ssh -t` kullanın; sihirbaz soru sorar. Her soruda köşeli paran
 
 | Adım | Ne olur | Ne yazarsınız |
 |---|---|---|
-| 1. Ön kontroller | docker, nginx, bellek, 8090 portu | — |
+| 1. Ön kontroller | docker, nginx, bellek, 8090 portu; GitHub'da yeni değişiklik varsa listeler ve çekilsin mi diye sorar (`git pull`, yalnız ileri sarma; sunucuda kaydedilmemiş değişiklik varsa dokunmaz) | `e` |
 | 2. Alan adı ve e-posta | `[kyrox.studio]`, `[hello@kyrox.studio]` | Enter, Enter |
 | 3. Ayar dosyası | `sunucu/.env` yoksa rastgele veritabanı şifreleri ve WordPress anahtarlarıyla oluşturulur | — |
 | 4. Kapsayıcılar | WordPress + MariaDB başlar, yalnız `127.0.0.1:8090` | — |
@@ -101,6 +101,12 @@ Bağlanırken `ssh -t` kullanın; sihirbaz soru sorar. Her soruda köşeli paran
 | 7. SSL | DNS sunucuyu gösteriyorsa Let's Encrypt kullanım koşullarını kabul edip etmediğinizi sorar; kabul ederseniz sertifika alınır ve site `https`'e geçer | `e` |
 
 Sihirbaz tekrar çalıştırılabilir: kurulu WordPress'e, yönetici hesabına, yazılmış nginx sitesine ve alınmış sertifikaya dokunmaz. DNS sonradan yayıldıysa tekrar çalıştırmak yalnız SSL'i ekler.
+
+**Güncelleme:** Siteyi GitHub'daki son hale getirmek için sihirbazı tekrar çalıştırın; ilk adımda değişiklikleri çeker. Sihirbazın kendisi değiştiyse yeni sürümle baştan başlar. Tema dosyaları kapsayıcıya doğrudan bağlı olduğu için çekilen tema değişiklikleri hemen yayına girer.
+
+```bash
+sudo bash /opt/kyrox/kyrox-web/sunucu/kur.sh
+```
 
 Mevcut nginx siteleri değişmez; yeni site `/etc/nginx/sites-available/kyrox-studio` dosyasıdır ve `nginx -t` geçmezse nginx yeniden yüklenmez.
 
