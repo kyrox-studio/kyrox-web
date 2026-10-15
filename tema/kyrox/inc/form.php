@@ -90,7 +90,7 @@ function kyrox_talep_al( WP_REST_Request $istek ) {
 	$anahtar = 'kyrox_talep_' . md5( (string) ( $_SERVER['HTTP_X_REAL_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '' ) );
 	$sayi    = (int) get_transient( $anahtar );
 	if ( $sayi >= KYROX_TALEP_LIMIT ) {
-		return new WP_Error( 'kyrox_sinir', 'Kısa sürede çok fazla talep gönderildi; biraz sonra tekrar deneyin ya da WhatsApp\'tan yazın.', array( 'status' => 429 ) );
+		return new WP_Error( 'kyrox_sinir', 'Kısa sürede çok fazla talep gönderildi; biraz sonra tekrar deneyin.', array( 'status' => 429 ) );
 	}
 	set_transient( $anahtar, $sayi + 1, KYROX_TALEP_SURE );
 
@@ -105,7 +105,7 @@ function kyrox_talep_al( WP_REST_Request $istek ) {
 		true
 	);
 	if ( is_wp_error( $kayit ) ) {
-		return new WP_Error( 'kyrox_kayit', 'Talep kaydedilemedi; lütfen WhatsApp\'tan yazın.', array( 'status' => 500 ) );
+		return new WP_Error( 'kyrox_kayit', 'Talep kaydedilemedi.', array( 'status' => 500 ) );
 	}
 
 	$ad        = get_bloginfo( 'name' );
