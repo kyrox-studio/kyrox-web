@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # kyrox.studio WordPress kurulum sihirbazı (sunucu).
+# Önce GitHub'daki yeni değişiklikleri sorarak çeker (git pull).
 # Adım adım sorar: alan adı, yönetici hesabı, SSL. Tekrar çalıştırılabilir; yapılmış
 # adımları atlar (kurulu WordPress'e, yazılmış nginx sitesine, alınmış sertifikaya dokunmaz).
 #
@@ -62,6 +63,50 @@ env_set() {
 }
 gizli() { openssl rand -base64 48 | tr -d '\n/+=' | cut -c1-64; }
 
+# GitHub'daki yeni değişiklikleri sorarak çeker (yalnız ileri sarma; yerel değişiklik
+# varsa dokunmaz). kur.sh'nin kendisi değiştiyse yeni sürümle baştan başlar.
+guncelle_repo() {
+  local repo once sonra geride
+  repo="$(dirname "$SUNUCU_DIR")"
+  if [[ -n "${KUR_GUNCELLENDI:-}" ]]; then
+    log "Kod güncel ($(git -C "$repo" log -1 --format='%h %s'))."
+    return 0
+  fi
+  if ! command -v git >/dev/null || ! git -C "$repo" rev-parse --git-dir >/dev/null 2>&1; then
+    log "UYARI: ${repo} bir git deposu değil; güncelleme denetimi atlandı."
+    return 0
+  fi
+  if ! git -C "$repo" fetch --quiet 2>/dev/null; then
+    log "UYARI: GitHub'a ulaşılamadı; mevcut kodla devam ediliyor."
+    return 0
+  fi
+  if ! git -C "$repo" rev-parse --verify --quiet '@{u}' >/dev/null; then
+    log "UYARI: $(git -C "$repo" branch --show-current) dalının GitHub karşılığı yok; güncelleme atlandı."
+    return 0
+  fi
+  geride="$(git -C "$repo" rev-list --count 'HEAD..@{u}')"
+  if (( geride == 0 )); then
+    log "Kod güncel ($(git -C "$repo" log -1 --format='%h %s'))."
+    return 0
+  fi
+  echo "  GitHub'da ${geride} yeni değişiklik var:"
+  git -C "$repo" log -n 10 --format='    %h %s' 'HEAD..@{u}'
+  if [[ -n "$(git -C "$repo" status --porcelain --untracked-files=no)" ]]; then
+    log "UYARI: ${repo} içinde kaydedilmemiş değişiklikler var; güncelleme atlandı:"
+    git -C "$repo" status --short --untracked-files=no | sed 's/^/    /'
+    return 0
+  fi
+  ask_yes_no "Bu değişiklikler çekilsin mi (git pull)?" "E" || { log "Güncelleme atlandı; mevcut kodla devam ediliyor."; return 0; }
+  once="$(git -C "$repo" hash-object "${SUNUCU_DIR}/kur.sh")"
+  git -C "$repo" pull --ff-only --quiet || die "git pull başarısız (dal GitHub'dan ayrılmış olabilir); ${repo} içinde elle bakın"
+  log "Güncellendi: $(git -C "$repo" log -1 --format='%h %s')"
+  sonra="$(git -C "$repo" hash-object "${SUNUCU_DIR}/kur.sh")"
+  if [[ "$once" != "$sonra" ]]; then
+    log "Sihirbazın kendisi de güncellendi; yeni sürümle baştan başlatılıyor."
+    KUR_GUNCELLENDI=1 exec bash "${SUNUCU_DIR}/kur.sh" "$@"
+  fi
+}
+
 # ─────────────────────────────────────────────────────────────
 step_title 1 "Ön kontroller"
 [[ "$(id -u)" -eq 0 ]] || die "root olarak çalıştırın: sudo bash $0"
@@ -70,6 +115,7 @@ command -v docker >/dev/null || die "docker kurulu değil"
 docker compose version >/dev/null 2>&1 || die "docker compose eklentisi yok"
 command -v nginx >/dev/null || die "nginx kurulu değil"
 command -v openssl >/dev/null || die "openssl kurulu değil"
+guncelle_repo "$@"
 bos_mb="$(free -m | awk '/^Mem:/ {print $7}')"
 log "Kullanılabilir bellek: ${bos_mb} MB (WordPress + MariaDB yaklaşık 300 MB kullanır)"
 (( bos_mb >= 400 )) || ask_yes_no "Bellek az görünüyor. Yine de devam edilsin mi?" "H" || die "İptal edildi"
