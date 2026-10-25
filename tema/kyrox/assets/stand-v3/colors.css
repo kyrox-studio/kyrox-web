@@ -1,0 +1,30 @@
+/*
+ * Kyrox Studio — marka renkleri
+ * Kurallar: kyrox-platform/standards/brand/BRAND_STANDARD.md, bölüm 6
+ * Aynı değerler tokens.json içinde; birini değiştirirsen diğerini de güncelle.
+ */
+:root {
+  /* Ana renkler */
+  --kyrox-ink: #0B0B0B; /* Mürekkep: başlık, metin, koyu zemin */
+  --kyrox-paper: #F5F3EF; /* Kağıt: ana zemin */
+  --kyrox-white: #FFFFFF; /* Beyaz: kart, form, tablo */
+
+  /* Bakır, üç ton */
+  --kyrox-copper: #C47A3A; /* Bakır: çizgi, ikon, grafik, 24 px ve üstü başlık. Metin ve buton zemini olarak kullanılmaz (kağıtta 3,06) */
+  --kyrox-copper-text: #99602D; /* Bakır koyu: link, buton zemini, vurgulu metin (kağıtta 4,66; üstünde beyaz 5,17) */
+  --kyrox-copper-on-dark: #CD8D56; /* Bakır açık: koyu zeminde link ve vurgu (mürekkepte 7,07) */
+
+  /* Sıcak griler */
+  --kyrox-gray-900: #2A2724; /* Gövde metni (kağıtta 13,4) */
+  --kyrox-gray-600: #6B655D; /* İkincil metin, açıklama (kağıtta 5,2) */
+  --kyrox-gray-400: #A39C93; /* Pasif öğe, ikon. Metin için kullanılmaz (kağıtta 2,45) */
+  --kyrox-gray-200: #DEDAD4; /* Çizgi, kenarlık */
+  --kyrox-gray-100: #EBE8E3; /* İkincil yüzey */
+  --kyrox-night: #1A1816; /* Koyu bölüm zemini */
+
+  /* Logo malzeme renkleri (sadece logoda) */
+  --kyrox-steel: #B4B7BB; /* Logo: çelik, açık zemin. Arayüz rengi değil */
+  --kyrox-steel-on-dark: #C9CCD0; /* Logo: çelik, koyu zemin. Arayüz rengi değil */
+  --kyrox-wood: #A2652C; /* Logo: ahşap. Arayüz rengi değil */
+  --kyrox-leather: #7B3B1D; /* Logo: deri. Arayüz rengi değil */
+}

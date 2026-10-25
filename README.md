@@ -17,10 +17,13 @@ Karar kaydı: [ADR-0011](https://github.com/kyrox-studio/kyrox-platform/blob/mai
 
 - **Yazılar:** blog. Yazılar `/blog/yazi-adi/` adresinde. Özet alanı Google ve paylaşım önizlemesinde kullanılır; etiketler yazının üstünde görünür.
 - **İşler** (sol menü): ana sayfadaki iş kartları. Her kartta tür, durum (Kullanımda / Tezgâhta), link ve teknik çizim seçimi var; sırayı "Sıra" alanı belirler.
+- **Sayfalar > Fuar CRM:** `/fuar-crm/` ürün tanıtımının başlığı, özeti ve içeriği. Tema güncellemesinden sonra yönetici paneli ilk açıldığında eksik başlangıç sayfası eklenir; mevcut sayfa içeriği değiştirilmez. Uygulama giriş adresi ürün tanımından gelir.
+- **Sayfalar > Stand Konfiguratör:** `/fuar-stand/` V3 tanıtımı. Elikon'un gerçek 9 × 5 m projesinden üretilen sahne, yalnız ziyaretçi seçtiğinde yüklenir. Ziyaretçi döndürür/yakınlaştırır; editör, oturum bilgileri, müşteri verisi veya kayıt API'si tanıtıma taşınmaz. Eski V1/V2 kaynakları korunmuştur. Ürün sayfalarını paneli açmadan kurmak için: `wp eval 'kyrox_urun_sayfalarini_kur();'` (yönetici kullanıcıyla).
 - **Görünüm > Özelleştir > Kyrox Studio:**
   - koyu / krem görünüm
   - açılış, giriş, atölye kartları, işler, blog ve iş fişi bölümlerinin metinleri
   - iletişim bilgileri (e-posta, WhatsApp, adres)
+  - Sık sorulan sorular bölümünün başlığı ve altı soru-cevabı
   - Google ve yapay zekâ için başlık, açıklama ve kurum tanıtımı
 
 Varsayılan metinler onaylı tasarımdakilerdir; bir alan boş bırakılırsa varsayılana döner.
@@ -32,6 +35,7 @@ Tema şunları kendisi üretir:
 - JSON-LD: `LocalBusiness`, `WebSite`; yazılarda ayrıca `BlogPosting` ve `BreadcrumbList`
 - `robots.txt`: yapay zekâ tarayıcıları açıkça davetli
 - `/llms.txt`: kurum, hizmetler, ürünler ve yazıların özeti
+- ana sayfadaki SSS metinleriyle aynı içerikten üretilen `FAQPage` bilgisi; SSS ayrıca `/llms.txt` içinde yer alır
 - site haritası: WordPress'in `/wp-sitemap.xml` dosyası; kullanıcı listesi çıkarılmıştır
 
 Yazı tipleri (Archivo, Inter) temanın içindedir; Google Fonts'a istek gitmez.
@@ -65,6 +69,8 @@ Bunlar bir kez yapılır; var olan içeriğe dokunulmaz.
 Tema klasörü kapsayıcıya salt okunur bağlanır; temada yaptığınız değişiklik sayfayı yenileyince görünür.
 
 Statik tasarımı önizlemek için: `node tasarim/serve.mjs` → `http://localhost:4321`.
+
+Stand V3 görüntüleyicisinin kaynağı `tasarim/stand-v3/viewer.js`, dağıtım dosyası `tema/kyrox/assets/stand-v3/viewer.js` içindedir. Yeniden derleme: `node tasarim/stand-v3/build-viewer.mjs`; kurulu Fair Stand bağımlılıkları kullanılır, farklı konum için `FAIR_STAND_ROOT` verilir. Sunucuya Node veya proje kataloğu gerekmez. Model kaynakları ve lisanslar tanıtım sayfasındaki bağlantıda tutulur. Ham proje/katalog dışa aktarımı ve erişim bilgileri dağıtım paketine konmaz.
 
 ## Kontroller
 

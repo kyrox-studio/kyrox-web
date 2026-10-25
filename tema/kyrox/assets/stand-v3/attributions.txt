@@ -1,0 +1,58 @@
+Elikon tanıtım sahnesi: modeller proje yerleşimine göre ölçeklendi ve birleştirilmiş sahne dosyası Meshopt/WebP ile sıkıştırıldı. Kaynak modellerin lisansları korunur.
+
+Bar Taburesi model attribution
+
+Title: Bar Chair
+Author: Ivar Kramer (@ivarkramer12)
+Source: https://sketchfab.com/3d-models/bar-chair-d5125bd7fae44192b59bd792f1d2bbd3
+License: CC BY 4.0
+License URL: https://creativecommons.org/licenses/by/4.0/
+
+The application loads the supplied GLB directly as public/models/bar_chair.glb; no model format conversion is required.
+
+
+Askılık model attribution
+
+Title: Coat Rack
+Author: martn00
+Source: https://sketchfab.com/3d-models/coat-rack-cb8fc6499d694c789550fe829e573887
+License: CC BY 4.0
+License URL: https://creativecommons.org/licenses/by/4.0/
+
+
+Eames chair
+Author: valeduque_portfolio
+Source: https://sketchfab.com/3d-models/eames-chair-a699822777e94849b1417a2a3c185e10
+License: CC BY 4.0
+
+
+Kettle model attribution
+
+Title: Kettle
+Author: simalmaili
+Source: https://sketchfab.com/3d-models/kettle-3e65d8a8cb6740519f753179ff2c14f1
+License: CC BY 4.0
+License URL: https://creativecommons.org/licenses/by/4.0/
+
+
+The MIT License
+
+Copyright © 2010-2026 three.js authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.

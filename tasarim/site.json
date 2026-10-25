@@ -23,8 +23,8 @@
     { "ad": "El işçiliği", "aciklama": "Montaj, yüzey işleme ve bitirme." }
   ],
   "urunler": [
-    { "ad": "Fuar CRM", "url": "https://fuar.kyrox.studio", "aciklama": "Fuar, firma, görüşme ve teklif süreçlerini tek yerde toplayan CRM." },
-    { "ad": "Fuar Stand", "url": "https://fuar.kyrox.studio", "aciklama": "Gerçek modüllerle 3D stand tasarımı ve malzeme listesi çıkaran konfigüratör." }
+    { "ad": "Fuar CRM", "url": "https://kyrox.studio/fuar-crm/", "aciklama": "Fuar, firma, görüşme ve teklif süreçlerini tek yerde toplayan CRM." },
+    { "ad": "Fuar Stand", "url": "https://kyrox.studio/fuar-stand/", "aciklama": "Gerçek modüllerle 3D stand tasarımı ve malzeme listesi çıkaran konfigüratör." }
   ],
   "sosyal": []
 }

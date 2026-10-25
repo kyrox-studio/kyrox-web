@@ -5,6 +5,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const DIST = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
+const SITE = new URL(JSON.parse(readFileSync(join(DIST, '..', 'site.json'), 'utf8')).url);
 const hatalar = [];
 
 function dosyalar(klasor) {
@@ -30,10 +31,29 @@ for (const f of htmller) {
   }
   if (!/<title>[^<]+<\/title>/.test(s)) hatalar.push(`${ad}: başlık yok`);
   if (!/<meta name="description" content="[^"]+">/.test(s)) hatalar.push(`${ad}: açıklama yok`);
-  for (const [, href] of s.matchAll(/(?:href|src)="(\/[^"#?]*)/g)) {
-    let hedef = join(DIST, href);
-    if (href.endsWith('/')) hedef = join(hedef, 'index.html');
-    if (!existsSync(hedef)) hatalar.push(`${ad}: kırık bağlantı ${href}`);
+  const sayfaUrl = new URL(ad.replaceAll('\\', '/'), SITE);
+  for (const [, ham] of s.matchAll(/\b(?:href|src)="([^"]+)"/g)) {
+    const href = ham.replace(/&(?:amp|#0*38);/g, '&');
+    let adres;
+    try { adres = new URL(href, sayfaUrl); }
+    catch { hatalar.push(`${ad}: geçersiz bağlantı ${href}`); continue; }
+    if (adres.origin !== SITE.origin) continue;
+    let hedef;
+    try { hedef = join(DIST, decodeURIComponent(adres.pathname)); }
+    catch { hatalar.push(`${ad}: geçersiz adres kodlaması ${href}`); continue; }
+    if (existsSync(hedef) && statSync(hedef).isDirectory()) hedef = join(hedef, 'index.html');
+    if (!existsSync(hedef)) {
+      hatalar.push(`${ad}: kırık bağlantı ${href}`);
+      continue;
+    }
+    if (adres.hash && hedef.endsWith('.html')) {
+      let kimlik;
+      try { kimlik = decodeURIComponent(adres.hash.slice(1)); }
+      catch { hatalar.push(`${ad}: geçersiz bölüm kodlaması ${href}`); continue; }
+      const hedefHtml = readFileSync(hedef, 'utf8');
+      const kimlikler = [...hedefHtml.matchAll(/\b(?:id|name)=["']([^"']+)["']/g)].map((m) => m[1]);
+      if (!kimlikler.includes(kimlik)) hatalar.push(`${ad}: bulunamayan bölüm ${href}`);
+    }
   }
 }
 
