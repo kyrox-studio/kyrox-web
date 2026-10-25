@@ -91,7 +91,7 @@ function kyrox_is_kutu( WP_Post $is ): void {
 	wp_nonce_field( 'kyrox_is_kaydet', 'kyrox_is_nonce' );
 	$tur   = get_post_meta( $is->ID, 'kyrox_tur', true );
 	$durum = get_post_meta( $is->ID, 'kyrox_durum', true ) ?: 'tezgahta';
-	$link  = get_post_meta( $is->ID, 'kyrox_link', true );
+	$link  = kyrox_is_adresi( $is );
 	$cizim = get_post_meta( $is->ID, 'kyrox_cizim', true ) ?: 'yok';
 	?>
 	<p><label><strong>Tür</strong> (kartın üstündeki küçük etiket, ör. "Yazılım", "Kod + 3D")<br>
@@ -181,16 +181,39 @@ function kyrox_isler(): array {
 	);
 }
 
+/** Başlangıç ürün kartlarını güncel hedefe bağlar; özel adresleri korur. */
+function kyrox_is_adresi( WP_Post $is ): string {
+	$link = (string) get_post_meta( $is->ID, 'kyrox_link', true );
+	if ( 'Fuar CRM' === get_the_title( $is )
+		&& 'ekran' === get_post_meta( $is->ID, 'kyrox_cizim', true )
+		&& 'https://fuar.kyrox.studio' === untrailingslashit( $link ) ) {
+		$sayfa = get_page_by_path( 'fuar-crm' );
+		if ( $sayfa && 'publish' === get_post_status( $sayfa ) ) {
+			return get_permalink( $sayfa );
+		}
+	}
+	if ( 'Fuar Stand' === get_the_title( $is )
+		&& 'stand' === get_post_meta( $is->ID, 'kyrox_cizim', true )
+		&& in_array( untrailingslashit( $link ), array( 'https://fuar.kyrox.studio', 'https://fuar.kyrox.studio/stand-projects' ), true ) ) {
+		$sayfa = get_page_by_path( 'fuar-stand' );
+		if ( $sayfa && 'publish' === get_post_status( $sayfa ) ) {
+			return get_permalink( $sayfa );
+		}
+		return 'https://fuar.kyrox.studio/stand-projects';
+	}
+	return $link;
+}
+
 /** Bir iş kartının HTML'i. */
 function kyrox_is_karti( WP_Post $is ): void {
 	$tur    = get_post_meta( $is->ID, 'kyrox_tur', true );
 	$durum  = kyrox_is_durumlari()[ get_post_meta( $is->ID, 'kyrox_durum', true ) ] ?? kyrox_is_durumlari()['yok'];
-	$link   = get_post_meta( $is->ID, 'kyrox_link', true );
+	$link   = kyrox_is_adresi( $is );
 	$cizim  = get_post_meta( $is->ID, 'kyrox_cizim', true ) ?: 'yok';
-	$dis    = (bool) $link;
-	$href   = $dis ? $link : '#iletisim';
+	$dis    = (bool) $link && wp_parse_url( $link, PHP_URL_HOST ) && wp_parse_url( $link, PHP_URL_HOST ) !== wp_parse_url( home_url( '/' ), PHP_URL_HOST );
+	$href   = $link ?: '#iletisim';
 	$gorsel = 'yok' === $cizim
-		? get_the_post_thumbnail( $is, 'large', array( 'loading' => 'lazy', 'alt' => '' ) )
+		? get_the_post_thumbnail( $is, 'large', array( 'loading' => 'lazy' ) )
 		: kyrox_cizim( $cizim );
 	printf(
 		'<a class="work" href="%1$s"%2$s><div class="vis">%3$s</div><div class="wbody">%4$s<h3>%5$s</h3>%6$s%7$s</div></a>',

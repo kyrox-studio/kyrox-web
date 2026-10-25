@@ -61,6 +61,11 @@ function kyrox_varsayilanlar(): array {
 		'isler_baslik'      => "Birbirine benzemeyen\nişleri seviyoruz.",
 		'isler_metin'       => 'Yazılım projesinden ahşap parçaya. İş değişiyor, yaklaşım değişmiyor: düşün, dene, üret.',
 
+		// Sık sorulan sorular
+		'sss_ust'           => 'Merak edilenler',
+		'sss_baslik'        => 'Sık sorulan sorular',
+		'sss_metin'         => 'Fuar CRM ve Stand Konfiguratör hakkında kısa cevaplar.',
+
 		// Blog
 		'blog_ust'          => 'Blog',
 		'blog_baslik'       => "Atölyeden\nnotlar.",
@@ -95,7 +100,32 @@ function kyrox_varsayilanlar(): array {
 		'takip_instagram'   => 'Üretimden kareler, 3D baskı ve ahşap süreçleri, kısa videolar.',
 		'takip_linkedin'    => 'Projeler, yazılım çalışmaları ve stüdyo haberleri.',
 	);
+	foreach ( kyrox_sss_varsayilanlari() as $i => $kayit ) {
+		$v[ 'sss' . ( $i + 1 ) . '_soru' ]  = $kayit['soru'];
+		$v[ 'sss' . ( $i + 1 ) . '_cevap' ] = $kayit['cevap'];
+	}
 	return $v;
+}
+
+/** Tema ve statik önizlemenin ortak başlangıç SSS içeriği. */
+function kyrox_sss_varsayilanlari(): array {
+	static $kayitlar = null;
+	if ( null === $kayitlar ) {
+		$kayitlar = json_decode( (string) file_get_contents( __DIR__ . '/baslangic/sss.json' ), true ) ?: array();
+	}
+	return $kayitlar;
+}
+
+/** Panelde düzenlenen ve sayfada gösterilen SSS içeriği. */
+function kyrox_sss(): array {
+	$kayitlar = array();
+	foreach ( kyrox_sss_varsayilanlari() as $i => $_varsayilan ) {
+		$kayitlar[] = array(
+			'soru'  => kyrox_ayar( 'sss' . ( $i + 1 ) . '_soru' ),
+			'cevap' => kyrox_ayar( 'sss' . ( $i + 1 ) . '_cevap' ),
+		);
+	}
+	return $kayitlar;
 }
 
 /** Bir ayarın değeri (boşsa varsayılan). */
@@ -221,6 +251,7 @@ add_action(
 			'kyrox_atolye'   => 'Atölye',
 			'kyrox_isler'    => 'İşler bölümü',
 			'kyrox_blog'     => 'Blog bölümü',
+			'kyrox_sss'      => 'Sık sorulan sorular',
 			'kyrox_fis'      => 'İş fişi',
 			'kyrox_iletisim' => 'İletişim bilgileri',
 			'kyrox_takip'    => 'Takip bandı (sosyal medya)',
@@ -328,6 +359,16 @@ add_action(
 				'blog_sayfa_metin' => array( 'Blog sayfası: giriş metni', 'textarea' ),
 			)
 		);
+		$sss_alanlari = array(
+			'sss_ust'    => 'Üst etiket',
+			'sss_baslik' => 'Başlık',
+			'sss_metin'  => array( 'Giriş metni', 'textarea' ),
+		);
+		foreach ( kyrox_sss_varsayilanlari() as $i => $_varsayilan ) {
+			$sss_alanlari[ 'sss' . ( $i + 1 ) . '_soru' ]  = 'Soru ' . ( $i + 1 );
+			$sss_alanlari[ 'sss' . ( $i + 1 ) . '_cevap' ] = array( 'Cevap ' . ( $i + 1 ), 'textarea' );
+		}
+		$ekle( 'kyrox_sss', $sss_alanlari );
 		$ekle(
 			'kyrox_fis',
 			array(

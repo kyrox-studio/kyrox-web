@@ -8,6 +8,7 @@ const KOK = dirname(fileURLToPath(import.meta.url));
 const DIST = join(KOK, 'dist');
 const oku = (p) => readFileSync(join(KOK, p), 'utf8');
 const site = JSON.parse(oku('site.json'));
+const urunler = JSON.parse(oku('../tema/kyrox/inc/baslangic/urunler.json'));
 const URL_KOK = site.url.replace(/\/$/, '');
 
 // ---------- yardımcılar ----------
@@ -204,6 +205,10 @@ function derle() {
   rmSync(DIST, { recursive: true, force: true });
   mkdirSync(DIST, { recursive: true });
   cpSync(join(KOK, 'public'), DIST, { recursive: true });
+  cpSync(join(KOK, '../tema/kyrox/assets/stand-v3'), join(DIST, 'assets/stand-v3'), {recursive:true});
+  cpSync(join(KOK, '../tema/kyrox/assets/fonts'), join(DIST, 'assets/fonts'), {recursive:true});
+  mkdirSync(join(DIST, 'assets/css'), {recursive:true});
+  cpSync(join(KOK, '../tema/kyrox/assets/css/fonts.css'), join(DIST, 'assets/css/fonts.css'));
 
   const websitesi = { '@type': 'WebSite', '@id': `${URL_KOK}/#site`, url: `${URL_KOK}/`, name: site.ad, inLanguage: 'tr-TR', publisher: { '@id': `${URL_KOK}/#kurum` } };
   const kurumBilgisi = kurum();
@@ -213,13 +218,32 @@ function derle() {
   const sonYazilar = son.length
     ? `<section class="wrap home-posts" id="blog"><div class="sectionhead"><div><span class="eyebrow">Blog</span><h2>Atölyeden<br>notlar.</h2></div><p>Denediklerimiz, öğrendiklerimiz.</p></div><ol class="post-list">${son.map(yaziSatiri).join('')}</ol><a class="all" href="/blog/">Tüm yazılar →</a></section>`
     : '';
-  const anasayfa = oku(`src/pages/anasayfa-${site.anasayfa}.html`).replace('{{sonYazilar}}', sonYazilar);
+  const sssKayitlari = JSON.parse(oku('../tema/kyrox/inc/baslangic/sss.json'));
+  const sss = `<section class="faq wrap" id="sss" aria-labelledby="sss-baslik"><div class="sectionhead"><div><span class="eyebrow">Merak edilenler</span><h2 id="sss-baslik">Sık sorulan sorular</h2></div><p>Fuar CRM ve Stand Konfiguratör hakkında kısa cevaplar.</p></div><div class="faq-list">${sssKayitlari.map(({soru, cevap}) => `<details class="faq-item"><summary>${kacis(soru)}</summary><p>${kacis(cevap)}</p></details>`).join('')}</div><a class="all" href="#iletisim">Başka bir sorunuz mu var? Bize yazın →</a></section>`;
+  const sssSemasi = { '@type': 'FAQPage', '@id': `${URL_KOK}/#sss`, mainEntity: sssKayitlari.map(({soru, cevap}) => ({ '@type': 'Question', name: soru, acceptedAnswer: { '@type': 'Answer', text: cevap } })) };
+  const anasayfa = oku(`src/pages/anasayfa-${site.anasayfa}.html`).replace('{{sonYazilar}}', sonYazilar).replace('{{sss}}', sss);
   yaz('index.html', sayfa({
     baslik: site.baslik, aciklama: site.aciklama, yol: '/', icerik: anasayfa,
-    graf: [kurumBilgisi, websitesi],
+    graf: [kurumBilgisi, websitesi, sssSemasi],
     ekHead: '<link rel="stylesheet" href="/assets/blog.css">',
     scriptler: '<script src="/assets/anasayfa.js" defer></script>',
   }));
+
+  // Herkese açık ürün tanıtımları; WordPress başlangıç içeriğiyle aynı kaynak.
+  for (const urun of urunler) {
+    if (urun.bagimsiz) {
+      const icerik = oku('../tema/kyrox/inc/baslangic/' + urun.icerik).replaceAll('{{STAND_ASSETS}}','/assets/stand-v3');
+      const adres = `${URL_KOK}/${urun.adres}/`;
+      const graf = [kurumBilgisi, websitesi, {'@type':'WebPage','@id':adres,name:urun.baslik,url:adres,description:urun.aciklama}, {'@type':'SoftwareApplication',name:'Kyrox Studio Stand Konfiguratör',applicationCategory:'BusinessApplication',operatingSystem:'Web',url:adres}];
+      yaz(`${urun.adres}/index.html`, `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kyrox Studio | Stand Konfiguratör</title><meta name="description" content="${kacis(urun.aciklama)}"><link rel="canonical" href="${adres}"><link rel="icon" href="/favicon.svg"><meta property="og:type" content="website"><meta property="og:title" content="Kyrox Studio | Stand Konfiguratör"><meta property="og:description" content="${kacis(urun.aciklama)}"><meta property="og:url" content="${adres}"><meta property="og:image" content="${URL_KOK}/assets/stand-v3/og-image.webp"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><link rel="stylesheet" href="/assets/css/fonts.css"><link rel="stylesheet" href="/assets/stand-v3/colors.css"><link rel="stylesheet" href="/assets/stand-v3/styles-v3.css"><script type="application/ld+json">${jsonld(graf)}</script></head><body class="stand-landing">${icerik}<script src="/assets/stand-v3/interactions-v3.js" defer></script></body></html>`);
+      continue;
+    }
+    const icerik = `<main id="bas" class="product-page wrap"><header class="product-hero"><a class="all" href="/#projeler">← Tüm projeler</a><span class="eyebrow">${kacis(urun.etiket)}</span><h1>${kacis(urun.baslik)}</h1><p class="product-lead">${kacis(urun.aciklama)}</p><div class="product-actions"><a class="cta" href="${kacis(urun.uygulama)}" target="_blank" rel="noopener noreferrer">${kacis(urun.dugme)} ↗</a><a class="pill" href="/#iletisim">Bilgi alın →</a></div></header><div class="product-content">${oku('../tema/kyrox/inc/baslangic/' + urun.icerik)}</div></main>`;
+    yaz(`${urun.adres}/index.html`, sayfa({
+      baslik: `${urun.baslik} | ${site.ad}`, aciklama: urun.aciklama,
+      yol: `/${urun.adres}/`, icerik, graf: [kurumBilgisi, websitesi],
+    }));
+  }
 
   // blog listesi
   const liste = doldur(oku('src/templates/blog-liste.html'), {
@@ -271,6 +295,7 @@ function derle() {
   const urller = [
     { loc: '/', lastmod: yazilar[0]?.tarih || bugun },
     { loc: '/blog/', lastmod: yazilar[0]?.tarih || bugun },
+    ...urunler.map((urun) => ({ loc: `/${urun.adres}/`, lastmod: bugun })),
     ...yazilar.map((y) => ({ loc: `/blog/${y.adres}/`, lastmod: y.guncelleme || y.tarih })),
   ];
   yaz('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urller.map((u) => `  <url><loc>${URL_KOK}${u.loc}</loc><lastmod>${u.lastmod}</lastmod></url>`).join('\n')}\n</urlset>\n`);
@@ -302,6 +327,10 @@ function derle() {
     '## Yazılım ürünleri',
     '',
     ...site.urunler.map((u) => `- [${u.ad}](${u.url}): ${u.aciklama}`),
+    '',
+    '## Sık sorulan sorular',
+    '',
+    ...sssKayitlari.map(({soru, cevap}) => `- ${soru}: ${cevap}`),
     '',
     '## Blog',
     '',

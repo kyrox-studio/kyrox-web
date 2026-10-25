@@ -41,6 +41,9 @@ function kyrox_sayfa_adresi(): string {
 add_filter(
 	'pre_get_document_title',
 	function ( $baslik ) {
+		if ( is_page( 'fuar-stand' ) ) {
+			return 'Kyrox Studio | Stand Konfiguratör';
+		}
 		return is_front_page() ? kyrox_ayar( 'seo_baslik' ) : $baslik;
 	}
 );
@@ -59,7 +62,7 @@ add_action(
 		$aciklama = kyrox_sayfa_aciklamasi();
 		$adres    = kyrox_sayfa_adresi();
 		$baslik   = wp_get_document_title();
-		$gorsel   = kyrox_varlik( 'img/og-image.png' );
+		$gorsel   = kyrox_varlik( is_page( 'fuar-stand' ) ? 'stand-v3/og-image.webp' : 'img/og-image.png' );
 		$tur      = is_singular( 'post' ) ? 'article' : 'website';
 
 		echo '<meta name="theme-color" content="#111210">' . "\n";
@@ -151,6 +154,20 @@ function kyrox_jsonld(): array {
 		'publisher'  => array( '@id' => $kok . '/#kurum' ),
 	);
 	$graf = array( $kurum, $site );
+	if ( is_front_page() ) {
+		$graf[] = array(
+			'@type'      => 'FAQPage',
+			'@id'        => $kok . '/#sss',
+			'mainEntity' => array_map(
+				fn( $kayit ) => array(
+					'@type'          => 'Question',
+					'name'           => $kayit['soru'],
+					'acceptedAnswer' => array( '@type' => 'Answer', 'text' => $kayit['cevap'] ),
+				),
+				kyrox_sss()
+			),
+		);
+	}
 
 	if ( is_home() ) {
 		$graf[] = array(
@@ -205,7 +222,7 @@ add_filter(
 		$botlar = array( 'Googlebot', 'Bingbot', 'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-SearchBot', 'Claude-User', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot', 'Applebot-Extended', 'YandexBot', 'DuckDuckBot' );
 		$satir  = array( '# Kyrox Studio: tüm arama motorları ve yapay zekâ asistanları bu siteyi okuyabilir.' );
 		foreach ( $botlar as $bot ) {
-			$satir[] = "User-agent: {$bot}\nAllow: /\n";
+			$satir[] = "User-agent: {$bot}\nAllow: /\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n";
 		}
 		$satir[] = "User-agent: *\nAllow: /\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n";
 		$satir[] = 'Sitemap: ' . home_url( '/wp-sitemap.xml' );
@@ -250,14 +267,20 @@ function kyrox_llms_metni(): string {
 	for ( $i = 1; $i <= 4; $i++ ) {
 		$s[] = '- ' . kyrox_ayar( "arac{$i}_baslik" ) . ': ' . kyrox_ayar( "arac{$i}_metin" );
 	}
-	$isler = array_filter( kyrox_isler(), fn( $is ) => (bool) get_post_meta( $is->ID, 'kyrox_link', true ) );
+	$isler = array_filter( kyrox_isler(), fn( $is ) => (bool) kyrox_is_adresi( $is ) );
 	if ( $isler ) {
 		$s[] = '';
 		$s[] = '## Yazılım ürünleri';
 		$s[] = '';
 		foreach ( $isler as $is ) {
-			$s[] = '- [' . get_the_title( $is ) . '](' . get_post_meta( $is->ID, 'kyrox_link', true ) . '): ' . wp_strip_all_tags( $is->post_excerpt );
+			$s[] = '- [' . get_the_title( $is ) . '](' . kyrox_is_adresi( $is ) . '): ' . wp_strip_all_tags( $is->post_excerpt );
 		}
+	}
+	$s[]     = '';
+	$s[]     = '## Sık sorulan sorular';
+	$s[]     = '';
+	foreach ( kyrox_sss() as $kayit ) {
+		$s[] = '- ' . $kayit['soru'] . ': ' . $kayit['cevap'];
 	}
 	$s[]     = '';
 	$s[]     = '## Blog';

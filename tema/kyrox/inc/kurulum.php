@@ -100,6 +100,7 @@ function kyrox_kur(): void {
 	}
 
 	kyrox_ornek_yazi();
+	kyrox_urun_sayfalarini_kur();
 	kyrox_ornek_isler();
 
 	update_option( 'kyrox_kurulum', KYROX_KURULUM_SURUMU );
@@ -136,8 +137,8 @@ function kyrox_ornek_isler(): void {
 		return;
 	}
 	$isler = array(
-		array( 'Fuar CRM', 'Fuar, firma, görüşme ve teklif süreçleri tek bir yerde.', 'Yazılım', 'kullanimda', 'https://fuar.kyrox.studio', 'ekran' ),
-		array( 'Fuar Stand', 'Gerçek modüllerle 3D stand tasarımı ve malzeme listeleri.', 'Kod + 3D', 'kullanimda', 'https://fuar.kyrox.studio', 'stand' ),
+		array( 'Fuar CRM', 'Fuar, firma, görüşme ve teklif süreçleri tek bir yerde.', 'Yazılım', 'kullanimda', home_url( '/fuar-crm/' ), 'ekran' ),
+		array( 'Fuar Stand', 'Gerçek modüllerle 3D stand tasarımı ve malzeme listeleri.', 'Kod + 3D', 'kullanimda', home_url( '/fuar-stand/' ), 'stand' ),
 		array( 'Ahşap Rakle', 'Ele oturan, baskı ve folyo uygulamaları için ahşap araç.', 'Ahşap', 'tezgahta', '', 'rakle' ),
 		array( 'Kutu Harf', 'Ölçüye göre tasarlanan ve üretilen harfler, logolar.', '3D Üretim', 'tezgahta', '', 'harf' ),
 	);

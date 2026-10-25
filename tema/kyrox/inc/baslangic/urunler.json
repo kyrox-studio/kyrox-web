@@ -1,0 +1,21 @@
+[
+  {
+    "adres": "fuar-crm",
+    "baslik": "Fuar CRM",
+    "etiket": "Fuar ve stand firmaları için",
+    "aciklama": "Müşterilerinizi, fuar katılımlarını, görüşmeleri, görevleri ve teklif süreçlerini tek yerde takip edin.",
+    "uygulama": "https://fuar.kyrox.studio/",
+    "dugme": "Fuar CRM'ye giriş yap",
+    "icerik": "fuar-crm.html"
+  },
+  {
+    "adres": "fuar-stand",
+    "baslik": "Stand Konfiguratör",
+    "etiket": "Gerçek modüllerle 3D stand tasarımı",
+    "aciklama": "Standınızı gerçek ölçülerle tasarlayın. Elikon projesini giriş yapmadan 3D döndürün; tasarım, malzeme listesi ve tanımlı fiyatlarla maliyet akışını inceleyin.",
+    "uygulama": "https://fuar.kyrox.studio/stand-projects",
+    "dugme": "Stand tasarlamaya başla",
+    "icerik": "fuar-stand.html",
+    "bagimsiz": true
+  }
+]

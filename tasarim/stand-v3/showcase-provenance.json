@@ -1,0 +1,13 @@
+{
+  "project": "Elikon",
+  "widthM": 9,
+  "depthM": 5,
+  "sourceModules": 29,
+  "renderedModules": 29,
+  "geometrySimplified": false,
+  "sourceRendererCommit": "06f205bf",
+  "exportedOn": "2026-10-25",
+  "format": "glTF 2.0 / Meshopt / WebP",
+  "sha256": "730f0a9111277729a81ef498ba3e83c3727961386ae8558ed225b05ca233b631",
+  "note": "Yalnız gerçek projenin görsel sahnesi. Müşteri, organizasyon, yetki, fiyat ve ham katalog verisi yayımlanmaz."
+}
