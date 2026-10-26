@@ -156,10 +156,10 @@ const jsonld = (graf) => JSON.stringify({ '@context': 'https://schema.org', '@gr
 const layout = oku('src/templates/layout.html');
 const header = oku('src/partials/header.html').trim();
 const footer = oku('src/partials/footer.html').trim();
-function sayfa({ baslik, aciklama, yol, icerik, graf, ogTur = 'website', ekHead = '', scriptler = '' }) {
+function sayfa({ baslik, aciklama, yol, icerik, graf, ogTur = 'website', ogGorsel = '/og-image.png', ogGorselAlt = 'Kyrox Studio — Fikirden üretime', ekHead = '', scriptler = '' }) {
   return doldur(layout, {
     baslik: kacis(baslik), aciklama: kacis(aciklama), canonical: `${URL_KOK}${yol}`,
-    ogTur, ogGorsel: `${URL_KOK}/og-image.png`, ekHead, jsonld: jsonld(graf),
+    ogTur, ogGorsel: `${URL_KOK}${ogGorsel}`, ogGorselAlt: kacis(ogGorselAlt), ekHead, jsonld: jsonld(graf),
     header, icerik, footer, scriptler,
   });
 }
@@ -206,6 +206,7 @@ function derle() {
   mkdirSync(DIST, { recursive: true });
   cpSync(join(KOK, 'public'), DIST, { recursive: true });
   cpSync(join(KOK, '../tema/kyrox/assets/stand-v3'), join(DIST, 'assets/stand-v3'), {recursive:true});
+  cpSync(join(KOK, '../tema/kyrox/assets/social'), join(DIST, 'assets/social'), {recursive:true});
   cpSync(join(KOK, '../tema/kyrox/assets/fonts'), join(DIST, 'assets/fonts'), {recursive:true});
   mkdirSync(join(DIST, 'assets/css'), {recursive:true});
   cpSync(join(KOK, '../tema/kyrox/assets/css/fonts.css'), join(DIST, 'assets/css/fonts.css'));
@@ -229,19 +230,26 @@ function derle() {
     scriptler: '<script src="/assets/anasayfa.js" defer></script>',
   }));
 
+  const urunSemasi = (urun) => {
+    const adres = URL_KOK + '/' + urun.adres + '/';
+    return [kurumBilgisi, websitesi,
+      {'@type':'WebPage','@id':adres+'#sayfa',url:adres,name:urun.seoBaslik,description:urun.aciklama,inLanguage:'tr-TR',isPartOf:{'@id':URL_KOK+'/#site'},about:{'@type':'Thing',name:urun.baslik},primaryImageOfPage:{'@type':'ImageObject',url:URL_KOK+'/assets/'+urun.paylasimGorseli,width:1200,height:630},breadcrumb:{'@id':adres+'#yol'}},
+      {'@type':'BreadcrumbList','@id':adres+'#yol',itemListElement:[{'@type':'ListItem',position:1,name:'Ana sayfa',item:URL_KOK+'/'},{'@type':'ListItem',position:2,name:urun.baslik,item:adres}]}
+    ];
+  };
   // Herkese açık ürün tanıtımları; WordPress başlangıç içeriğiyle aynı kaynak.
   for (const urun of urunler) {
     if (urun.bagimsiz) {
       const icerik = oku('../tema/kyrox/inc/baslangic/' + urun.icerik).replaceAll('{{STAND_ASSETS}}','/assets/stand-v3');
       const adres = `${URL_KOK}/${urun.adres}/`;
-      const graf = [kurumBilgisi, websitesi, {'@type':'WebPage','@id':adres,name:urun.baslik,url:adres,description:urun.aciklama}, {'@type':'SoftwareApplication',name:'Kyrox Studio Stand Konfiguratör',applicationCategory:'BusinessApplication',operatingSystem:'Web',url:adres}];
-      yaz(`${urun.adres}/index.html`, `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kyrox Studio | Stand Konfiguratör</title><meta name="description" content="${kacis(urun.aciklama)}"><link rel="canonical" href="${adres}"><link rel="icon" href="/favicon.svg"><meta property="og:type" content="website"><meta property="og:title" content="Kyrox Studio | Stand Konfiguratör"><meta property="og:description" content="${kacis(urun.aciklama)}"><meta property="og:url" content="${adres}"><meta property="og:image" content="${URL_KOK}/assets/stand-v3/og-image.webp"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><link rel="stylesheet" href="/assets/css/fonts.css"><link rel="stylesheet" href="/assets/stand-v3/colors.css"><link rel="stylesheet" href="/assets/stand-v3/styles-v3.css"><script type="application/ld+json">${jsonld(graf)}</script></head><body class="stand-landing">${icerik}<script src="/assets/stand-v3/interactions-v3.js" defer></script></body></html>`);
+      const graf = urunSemasi(urun);
+      yaz(`${urun.adres}/index.html`, `<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kyrox Studio | Stand Konfiguratör</title><meta name="description" content="${kacis(urun.aciklama)}"><link rel="canonical" href="${adres}"><link rel="icon" href="/favicon.svg"><meta property="og:type" content="website"><meta property="og:title" content="Kyrox Studio | Stand Konfiguratör"><meta property="og:description" content="${kacis(urun.aciklama)}"><meta property="og:url" content="${adres}"><meta property="og:image" content="${URL_KOK}/assets/stand-v3/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:type" content="image/png"><meta property="og:image:alt" content="${kacis(urun.paylasimAlt)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${kacis(urun.seoBaslik)}"><meta name="twitter:description" content="${kacis(urun.aciklama)}"><meta name="twitter:image" content="${URL_KOK}/assets/${urun.paylasimGorseli}"><meta name="twitter:image:alt" content="${kacis(urun.paylasimAlt)}"><link rel="stylesheet" href="/assets/css/fonts.css"><link rel="stylesheet" href="/assets/stand-v3/colors.css"><link rel="stylesheet" href="/assets/stand-v3/styles-v3.css"><script type="application/ld+json">${jsonld(graf)}</script></head><body class="stand-landing">${icerik}<script src="/assets/stand-v3/interactions-v3.js" defer></script></body></html>`);
       continue;
     }
     const icerik = `<main id="bas" class="product-page wrap"><header class="product-hero"><a class="all" href="/#projeler">← Tüm projeler</a><span class="eyebrow">${kacis(urun.etiket)}</span><h1>${kacis(urun.baslik)}</h1><p class="product-lead">${kacis(urun.aciklama)}</p><div class="product-actions"><a class="cta" href="${kacis(urun.uygulama)}" target="_blank" rel="noopener noreferrer">${kacis(urun.dugme)} ↗</a><a class="pill" href="/#iletisim">Bilgi alın →</a></div></header><div class="product-content">${oku('../tema/kyrox/inc/baslangic/' + urun.icerik)}</div></main>`;
     yaz(`${urun.adres}/index.html`, sayfa({
-      baslik: `${urun.baslik} | ${site.ad}`, aciklama: urun.aciklama,
-      yol: `/${urun.adres}/`, icerik, graf: [kurumBilgisi, websitesi],
+      baslik: urun.seoBaslik, aciklama: urun.aciklama, ogGorsel: `/assets/${urun.paylasimGorseli}`, ogGorselAlt: urun.paylasimAlt,
+      yol: `/${urun.adres}/`, icerik, graf: urunSemasi(urun),
     }));
   }
 
