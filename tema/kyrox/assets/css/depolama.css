@@ -1,0 +1,15 @@
+.kyrox-bilgi button{font:inherit;color:inherit;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;text-underline-offset:3px}
+.kyrox-storage-prompt[hidden]{display:none!important}
+.kyrox-storage-prompt,.kyrox-storage-dialog{background:#181918;color:#f5f3ef;border:1px solid #777;padding:22px;font:400 14px/1.6 Inter,system-ui,sans-serif}
+.kyrox-storage-prompt{position:fixed;z-index:10000;bottom:16px;left:16px;max-width:560px;width:calc(100% - 32px);box-sizing:border-box;box-shadow:0 8px 35px #0008;max-height:70dvh;overflow:auto}
+.kyrox-storage-prompt p,.kyrox-storage-dialog p{font-size:14px;line-height:1.6;margin:0 0 16px;color:inherit}
+.kyrox-storage-dialog{max-width:600px;width:calc(100% - 32px);max-height:85dvh;overflow:auto;box-sizing:border-box;margin:auto}
+.kyrox-storage-dialog::backdrop{background:#0009}
+.kyrox-storage-dialog h2{font:600 24px/1.2 Inter,system-ui,sans-serif;margin:0 0 18px}
+.kyrox-storage-dialog label{display:flex;align-items:center;gap:12px;padding:10px 0 18px}
+.kyrox-storage-dialog input{width:20px;height:20px;flex-shrink:0;accent-color:#cd8d56}
+.kyrox-storage-actions{display:flex;flex-wrap:wrap;gap:10px}
+.kyrox-storage-actions button{font:600 14px/1.4 Inter,system-ui,sans-serif;padding:11px 16px;min-height:44px;cursor:pointer;background:#f5f3ef;color:#181918;border:1px solid #aaa;border-radius:4px}
+.kyrox-storage-dialog a{color:#eab78b;text-decoration:underline}
+.kyrox-storage-actions button:focus-visible,.kyrox-storage-dialog a:focus-visible,.kyrox-bilgi button:focus-visible{outline:3px solid #cd8d56;outline-offset:3px}
+.kyrox-storage-status:empty{display:none}.kyrox-storage-status{font-size:13px;line-height:1.6;padding-bottom:14px}

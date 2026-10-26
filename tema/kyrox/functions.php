@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'KYROX_SURUM', '1.3.2' );
+define( 'KYROX_SURUM', '1.3.3' );
 define( 'KYROX_DIZIN', __DIR__ );
 
 require_once KYROX_DIZIN . '/inc/yardimci.php';
@@ -47,10 +47,12 @@ add_action(
 	function () {
 		$v = KYROX_SURUM;
 		wp_enqueue_style( 'kyrox-fonts', kyrox_varlik( 'css/fonts.css' ), array(), $v );
+		wp_enqueue_style( 'kyrox-depolama', kyrox_varlik( 'css/depolama.css' ), array( 'kyrox-fonts' ), $v );
+		wp_enqueue_script( 'kyrox-depolama', kyrox_varlik( 'js/depolama.js' ), array(), $v, array( 'strategy' => 'defer', 'in_footer' => true ) );
 		if ( is_page( 'fuar-stand' ) ) {
 			wp_enqueue_style( 'kyrox-stand-colors', kyrox_varlik( 'stand-v3/colors.css' ), array( 'kyrox-fonts' ), $v );
 			wp_enqueue_style( 'kyrox-stand-v3', kyrox_varlik( 'stand-v3/styles-v3.css' ), array( 'kyrox-stand-colors' ), $v );
-			wp_enqueue_script( 'kyrox-stand-v3', kyrox_varlik( 'stand-v3/interactions-v3.js' ), array(), $v, array( 'strategy' => 'defer', 'in_footer' => true ) );
+			wp_enqueue_script( 'kyrox-stand-v3', kyrox_varlik( 'stand-v3/interactions-v3.js' ), array( 'kyrox-depolama' ), $v, array( 'strategy' => 'defer', 'in_footer' => true ) );
 			wp_dequeue_style( 'wp-block-library' );
 			wp_dequeue_style( 'global-styles' );
 			wp_dequeue_style( 'classic-theme-styles' );

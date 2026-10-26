@@ -14008,64 +14008,66 @@ async function kd({ container: e, url: t, signal: n, onProgress: r = () => {} })
 	}
 	let S = null, C = !1;
 	try {
-		let c;
+		let c, l = () => globalThis.kyroxSceneStorage?.allowed() === !0;
 		try {
-			S = await globalThis.caches?.open("kyrox-stand-scenes-v1"), c = await S?.match(t), C = !!c;
+			l() && (S = await globalThis.caches?.open("kyrox-stand-scenes-v1"), c = await S?.match(t), C = !!c);
 		} catch {
 			S = null;
 		}
 		if (c ??= await fetch(t, {
 			signal: n,
 			credentials: "omit",
-			cache: "force-cache"
+			cache: l() ? "force-cache" : "no-store"
 		}), !c.ok) throw Error("Sahne dosyası yüklenemedi.");
-		let l = !C && S ? c.clone() : null, d = Number(c.headers.get("content-length")) || 0, f = c.body?.getReader(), p;
-		if (f) {
+		let d = !C && S ? c.clone() : null, f = Number(c.headers.get("content-length")) || 0, p = c.body?.getReader(), h;
+		if (p) {
 			let e = [], t = 0;
 			for (;;) {
-				let { done: n, value: i } = await f.read();
+				let { done: n, value: i } = await p.read();
 				if (n) break;
-				e.push(i), t += i.length, r(d ? Math.min(99, Math.round(t / d * 100)) : null);
+				e.push(i), t += i.length, r(f ? Math.min(99, Math.round(t / f * 100)) : null);
 			}
 			let n = new Uint8Array(t), i = 0;
 			for (let t of e) n.set(t, i), i += t.length;
-			p = n.buffer;
-		} else p = await c.arrayBuffer();
+			h = n.buffer;
+		} else h = await c.arrayBuffer();
 		n?.throwIfAborted();
-		let h = new ku();
-		if (h.setMeshoptDecoder(Od), u = (await h.parseAsync(p, new URL(".", t).href)).scene, n?.throwIfAborted(), a.add(u), l) try {
-			await S.put(t, l);
-			let e = new URL(t);
-			for (let t of await S.keys()) {
-				let n = new URL(t.url);
-				n.pathname === e.pathname && n.href !== e.href && await S.delete(t);
+		let b = new ku();
+		if (b.setMeshoptDecoder(Od), u = (await b.parseAsync(h, new URL(".", t).href)).scene, n?.throwIfAborted(), a.add(u), d && l()) try {
+			if (await S.put(t, d), !l()) await globalThis.caches?.delete("kyrox-stand-scenes-v1");
+			else {
+				let e = new URL(t);
+				for (let t of await S.keys()) {
+					let n = new URL(t.url);
+					n.pathname === e.pathname && n.href !== e.href && await S.delete(t);
+				}
 			}
 		} catch {}
-		let b = new qn().setFromObject(u), w = b.getCenter(new K()), T = b.getSize(new K()), E = Math.max(T.x, T.z, T.y) * .9, D = new K(w.x, Math.max(1.35, T.y * .43), w.z);
-		function O() {
-			let e = Dt.degToRad(o.fov / 2), t = (Math.max(T.x / (2 * Math.tan(e) * o.aspect), T.y / (2 * Math.tan(e)), T.z) + T.z * .55) * 1.25;
-			s.target.copy(D), o.position.copy(D).add(new K(-.14, .55, 1).normalize().multiplyScalar(t)), o.lookAt(D), s.update(), m();
+		let w = new qn().setFromObject(u), T = w.getCenter(new K()), E = w.getSize(new K()), D = Math.max(E.x, E.z, E.y) * .9, O = new K(T.x, Math.max(1.35, E.y * .43), T.z);
+		function k() {
+			let e = Dt.degToRad(o.fov / 2), t = (Math.max(E.x / (2 * Math.tan(e) * o.aspect), E.y / (2 * Math.tan(e)), E.z) + E.z * .55) * 1.25;
+			s.target.copy(O), o.position.copy(O).add(new K(-.14, .55, 1).normalize().multiplyScalar(t)), o.lookAt(O), s.update(), m();
 		}
-		s.minDistance = Math.max(2, T.y), s.maxDistance = E * 3.3, e.appendChild(i.domElement), i.domElement.tabIndex = 0, i.domElement.setAttribute("aria-label", "Elikon standının gerçek 3D sahnesi. Ok tuşlarıyla döndürün, artı ve eksiyle yakınlaştırın, Home ile başlangıca dönün.");
-		let k = (e) => {
+		s.minDistance = Math.max(2, E.y), s.maxDistance = D * 3.3, e.appendChild(i.domElement), i.domElement.tabIndex = 0, i.domElement.setAttribute("aria-label", "Elikon standının gerçek 3D sahnesi. Ok tuşlarıyla döndürün, artı ve eksiyle yakınlaştırın, Home ile başlangıca dönün.");
+		let A = (e) => {
 			let t = new Lo().setFromVector3(o.position.clone().sub(s.target));
 			t.theta += e * Math.PI / 12, o.position.copy(s.target).add(new K().setFromSpherical(t)), s.update(), m();
-		}, A = (e) => {
+		}, ee = (e) => {
 			let t = o.position.clone().sub(s.target);
 			t.multiplyScalar(e > 0 ? .85 : 1.18), t.setLength(Dt.clamp(t.length(), s.minDistance, s.maxDistance)), o.position.copy(s.target).add(t), s.update(), m();
 		};
 		return i.domElement.addEventListener("keydown", (e) => {
-			if (e.key === "ArrowLeft") k(-1);
-			else if (e.key === "ArrowRight") k(1);
-			else if (e.key === "+" || e.key === "=") A(1);
-			else if (e.key === "-") A(-1);
-			else if (e.key === "Home") O();
+			if (e.key === "ArrowLeft") A(-1);
+			else if (e.key === "ArrowRight") A(1);
+			else if (e.key === "+" || e.key === "=") ee(1);
+			else if (e.key === "-") ee(-1);
+			else if (e.key === "Home") k();
 			else return;
 			e.preventDefault();
-		}), s.addEventListener("change", m), s.addEventListener("start", m), document.addEventListener("visibilitychange", y), _.observe(e), v.observe(e), g(), O(), r(100), {
-			home: O,
-			orbit: k,
-			zoom: A,
+		}), s.addEventListener("change", m), s.addEventListener("start", m), document.addEventListener("visibilitychange", y), _.observe(e), v.observe(e), g(), k(), r(100), {
+			home: k,
+			orbit: A,
+			zoom: ee,
 			dispose: x,
 			position: () => o.position.toArray(),
 			capture: () => (i.render(a, o), i.domElement.toDataURL("image/png"))
