@@ -21,3 +21,5 @@
 @media(max-width:680px){.field input,.field textarea{font-size:16px}}
 
 @media(max-width:350px){.navin{gap:12px}.navin .brand img{height:26px!important}}
+
+@media(max-width:1000px){.nav .links>a:not(.pill),.nav .links>.sicons,.nav .status{display:none}}
