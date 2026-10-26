@@ -6,7 +6,10 @@
     "aciklama": "Müşterilerinizi, fuar katılımlarını, görüşmeleri, görevleri ve teklif süreçlerini tek yerde takip edin.",
     "uygulama": "https://fuar.kyrox.studio/",
     "dugme": "Fuar CRM'ye giriş yap",
-    "icerik": "fuar-crm.html"
+    "icerik": "fuar-crm.html",
+    "seoBaslik": "Kyrox Studio | Fuar CRM",
+    "paylasimGorseli": "social/fuar-crm.png",
+    "paylasimAlt": "Kyrox Studio Fuar CRM — müşteri, fuar, görüşme, görev ve teklif takibi"
   },
   {
     "adres": "fuar-stand",
@@ -16,6 +19,9 @@
     "uygulama": "https://fuar.kyrox.studio/stand-projects",
     "dugme": "Stand tasarlamaya başla",
     "icerik": "fuar-stand.html",
-    "bagimsiz": true
+    "bagimsiz": true,
+    "seoBaslik": "Kyrox Studio | Stand Konfiguratör",
+    "paylasimGorseli": "stand-v3/og-image.png",
+    "paylasimAlt": "Elikon projesinin gerçek 9 × 5 metrelik 3D stand tasarımı"
   }
 ]

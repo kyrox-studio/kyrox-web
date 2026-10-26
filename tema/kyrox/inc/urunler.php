@@ -2,6 +2,15 @@
 /** Ürün tanıtım sayfalarının başlangıç içeriği ve mevcut içeriği koruyan kurulumu. */
 defined( 'ABSPATH' ) || exit;
 
+function kyrox_gecerli_urun(): ?array {
+	foreach ( kyrox_urunler() as $urun ) {
+		if ( is_page( $urun['adres'] ) ) {
+			return $urun;
+		}
+	}
+	return null;
+}
+
 function kyrox_urunler(): array {
 	static $urunler = null;
 	if ( null === $urunler ) {

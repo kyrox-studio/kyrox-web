@@ -41,8 +41,9 @@ function kyrox_sayfa_adresi(): string {
 add_filter(
 	'pre_get_document_title',
 	function ( $baslik ) {
-		if ( is_page( 'fuar-stand' ) ) {
-			return 'Kyrox Studio | Stand Konfiguratör';
+		$urun = kyrox_gecerli_urun();
+		if ( $urun ) {
+			return $urun['seoBaslik'];
 		}
 		return is_front_page() ? kyrox_ayar( 'seo_baslik' ) : $baslik;
 	}
@@ -62,7 +63,9 @@ add_action(
 		$aciklama = kyrox_sayfa_aciklamasi();
 		$adres    = kyrox_sayfa_adresi();
 		$baslik   = wp_get_document_title();
-		$gorsel   = kyrox_varlik( is_page( 'fuar-stand' ) ? 'stand-v3/og-image.webp' : 'img/og-image.png' );
+		$urun     = kyrox_gecerli_urun();
+		$gorsel   = kyrox_varlik( $urun ? $urun['paylasimGorseli'] : 'img/og-image.png' );
+		$gorsel_alt = $urun ? $urun['paylasimAlt'] : 'Kyrox Studio — Fikirden üretime';
 		$tur      = is_singular( 'post' ) ? 'article' : 'website';
 
 		echo '<meta name="theme-color" content="#111210">' . "\n";
@@ -83,6 +86,9 @@ add_action(
 			'og:title'     => $baslik,
 			'og:description' => $aciklama,
 			'og:image'     => $gorsel,
+			'og:image:secure_url' => $gorsel,
+			'og:image:type' => 'image/png',
+			'og:image:alt' => $gorsel_alt,
 			'og:image:width'  => '1200',
 			'og:image:height' => '630',
 		);
@@ -92,6 +98,9 @@ add_action(
 			}
 		}
 		echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
+		foreach ( array( 'title' => $baslik, 'description' => $aciklama, 'image' => $gorsel, 'image:alt' => $gorsel_alt ) as $ozellik => $deger ) {
+			printf( '<meta name="twitter:%s" content="%s">' . "\n", esc_attr( $ozellik ), esc_attr( $deger ) );
+		}
 
 		printf(
 			'<script type="application/ld+json">%s</script>' . "\n",
@@ -154,6 +163,25 @@ function kyrox_jsonld(): array {
 		'publisher'  => array( '@id' => $kok . '/#kurum' ),
 	);
 	$graf = array( $kurum, $site );
+	$urun = kyrox_gecerli_urun();
+	if ( $urun ) {
+		$adres = kyrox_sayfa_adresi();
+		$graf[] = array(
+			'@type' => 'WebPage', '@id' => $adres . '#sayfa', 'url' => $adres,
+			'name' => wp_get_document_title(), 'description' => kyrox_sayfa_aciklamasi(), 'inLanguage' => 'tr-TR',
+			'isPartOf' => array( '@id' => $kok . '/#site' ),
+			'about' => array( '@type' => 'Thing', 'name' => get_the_title() ),
+			'primaryImageOfPage' => array( '@type' => 'ImageObject', 'url' => kyrox_varlik( $urun['paylasimGorseli'] ), 'width' => 1200, 'height' => 630 ),
+			'breadcrumb' => array( '@id' => $adres . '#yol' ),
+		);
+		$graf[] = array(
+			'@type' => 'BreadcrumbList', '@id' => $adres . '#yol',
+			'itemListElement' => array(
+				array( '@type' => 'ListItem', 'position' => 1, 'name' => 'Ana sayfa', 'item' => $kok . '/' ),
+				array( '@type' => 'ListItem', 'position' => 2, 'name' => get_the_title(), 'item' => $adres ),
+			),
+		);
+	}
 	if ( is_front_page() ) {
 		$graf[] = array(
 			'@type'      => 'FAQPage',
