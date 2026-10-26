@@ -26,9 +26,13 @@ export async function createViewer({ container, url, signal, onProgress = () => 
   const visibility=()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;}else schedule();};
   const resources=new Set();
   function dispose(){if(disposed)return;disposed=true;cancelAnimationFrame(frame);observer.disconnect();intersection.disconnect();document.removeEventListener('visibilitychange',visibility);controls.dispose();root?.traverse(node=>{node.geometry?.dispose();for(const material of [node.material].flat().filter(Boolean)){for(const value of Object.values(material))if(value?.isTexture)resources.add(value);material.dispose();}});resources.forEach(t=>t.dispose());renderer.dispose();renderer.domElement.remove();}
+  let modelCache=null,fromCache=false;
   try {
-    const response=await fetch(url,{signal,credentials:'omit'});
+    let response;
+    try {modelCache=await globalThis.caches?.open('kyrox-stand-scenes-v1');response=await modelCache?.match(url);fromCache=Boolean(response);} catch {modelCache=null;}
+    response??=await fetch(url,{signal,credentials:'omit',cache:'force-cache'});
     if(!response.ok)throw new Error('Sahne dosyası yüklenemedi.');
+    const cacheCopy=!fromCache&&modelCache?response.clone():null;
     const total=Number(response.headers.get('content-length'))||0;
     const reader=response.body?.getReader();let binary;
     if(reader){const chunks=[];let size=0;while(true){const {done,value}=await reader.read();if(done)break;chunks.push(value);size+=value.length;onProgress(total?Math.min(99,Math.round(size/total*100)):null);}const merged=new Uint8Array(size);let offset=0;for(const chunk of chunks){merged.set(chunk,offset);offset+=chunk.length;}binary=merged.buffer;}
@@ -36,7 +40,8 @@ export async function createViewer({ container, url, signal, onProgress = () => 
     signal?.throwIfAborted();
     const loader=new GLTFLoader();loader.setMeshoptDecoder(MeshoptDecoder);
     const gltf=await loader.parseAsync(binary,new URL('.',url).href);
-    signal?.throwIfAborted();root=gltf.scene;scene.add(root);
+    root=gltf.scene;signal?.throwIfAborted();scene.add(root);
+    if(cacheCopy){try{await modelCache.put(url,cacheCopy);const current=new URL(url);for(const key of await modelCache.keys()){const old=new URL(key.url);if(old.pathname===current.pathname&&old.href!==current.href)await modelCache.delete(key);}}catch{/* Önbellek kotası doluysa sahne çalışmaya devam eder. */}}
     const box=new THREE.Box3().setFromObject(root),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
     const radius=Math.max(size.x,size.z,size.y)*0.9;
     const target=new THREE.Vector3(center.x,Math.max(1.35,size.y*0.43),center.z);
@@ -51,5 +56,5 @@ export async function createViewer({ container, url, signal, onProgress = () => 
     document.addEventListener('visibilitychange',visibility);observer.observe(container);intersection.observe(container);
     resize();home();onProgress(100);
     return {home,orbit,zoom,dispose,position:()=>camera.position.toArray(),capture:()=>{renderer.render(scene,camera);return renderer.domElement.toDataURL('image/png');}};
-  } catch(error){dispose();throw error;}
+  } catch(error){if(fromCache)await modelCache?.delete(url).catch(()=>{});dispose();throw error;}
 }

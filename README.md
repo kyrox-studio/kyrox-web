@@ -18,7 +18,7 @@ Karar kaydı: [ADR-0011](https://github.com/kyrox-studio/kyrox-platform/blob/mai
 - **Yazılar:** blog. Yazılar `/blog/yazi-adi/` adresinde. Özet alanı Google ve paylaşım önizlemesinde kullanılır; etiketler yazının üstünde görünür.
 - **İşler** (sol menü): ana sayfadaki iş kartları. Her kartta tür, durum (Kullanımda / Tezgâhta), link ve teknik çizim seçimi var; sırayı "Sıra" alanı belirler.
 - **Sayfalar > Fuar CRM:** `/fuar-crm/` ürün tanıtımının başlığı, özeti ve içeriği. Tema güncellemesinden sonra yönetici paneli ilk açıldığında eksik başlangıç sayfası eklenir; mevcut sayfa içeriği değiştirilmez. Uygulama giriş adresi ürün tanımından gelir.
-- **Sayfalar > Stand Konfiguratör:** `/fuar-stand/` V3 tanıtımı. Elikon'un gerçek 9 × 5 m projesinden üretilen sahne, yalnız ziyaretçi seçtiğinde yüklenir. Ziyaretçi döndürür/yakınlaştırır; editör, oturum bilgileri, müşteri verisi veya kayıt API'si tanıtıma taşınmaz. Eski V1/V2 kaynakları korunmuştur. Ürün sayfalarını paneli açmadan kurmak için: `wp eval 'kyrox_urun_sayfalarini_kur();'` (yönetici kullanıcıyla).
+- **Sayfalar > Stand Konfiguratör:** `/fuar-stand/` V3 tanıtımı. Elikon'un gerçek 9 × 5 m projesinden üretilen sahne otomatik açılır; sürümlü model tarayıcı önbelleğinde saklanır. İlk indirmede kapak korunur, sonraki açılışta önbellek kullanılır; depolama kullanılamazsa normal indirmeye dönülür. Ziyaretçi döndürür/yakınlaştırır; editör, oturum bilgileri, müşteri verisi veya kayıt API'si tanıtıma taşınmaz. Eski V1/V2 kaynakları korunmuştur. Ürün sayfalarını paneli açmadan kurmak için: `wp eval 'kyrox_urun_sayfalarini_kur();'` (yönetici kullanıcıyla).
 - **Görünüm > Özelleştir > Kyrox Studio:**
   - koyu / krem görünüm
   - açılış, giriş, atölye kartları, işler, blog ve iş fişi bölümlerinin metinleri
