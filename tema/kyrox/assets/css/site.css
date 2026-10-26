@@ -21,3 +21,5 @@
 .kyrox-bilgi{display:flex;flex-wrap:wrap;gap:16px;padding-block:22px;font-size:13px;border-top:1px solid var(--line,#454545)}.kyrox-bilgi a,.kyrox-form-bilgi a{text-decoration:underline;text-underline-offset:3px}.kyrox-bilgi a:focus-visible,.kyrox-form-bilgi a:focus-visible{outline:2px solid #cd8d56;outline-offset:4px}.kyrox-form-bilgi{font-size:13px;line-height:1.6;margin:4px 0 16px;color:#5f5c54}.kyrox-form-bilgi a{color:inherit}
 
 @media(max-width:680px){.field input,.field textarea{font-size:16px}}
+
+@media(max-width:350px){.navin{gap:12px}.navin .brand img{height:26px!important}}
