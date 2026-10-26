@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'KYROX_SURUM', '1.3.1' );
+define( 'KYROX_SURUM', '1.3.2' );
 define( 'KYROX_DIZIN', __DIR__ );
 
 require_once KYROX_DIZIN . '/inc/yardimci.php';
@@ -26,6 +26,7 @@ require_once KYROX_DIZIN . '/inc/seo.php';
 require_once KYROX_DIZIN . '/inc/guvenlik.php';
 require_once KYROX_DIZIN . '/inc/kurulum.php';
 require_once KYROX_DIZIN . '/inc/form.php';
+require_once KYROX_DIZIN . '/inc/bilgilendirme.php';
 
 add_action(
 	'after_setup_theme',

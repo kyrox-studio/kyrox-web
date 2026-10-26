@@ -12,6 +12,7 @@ while ( have_posts() ) {
 	$icerik = str_replace( '{{STAND_ASSETS}}', esc_url( kyrox_varlik( 'stand-v3' ) ), get_the_content() );
 	echo apply_filters( 'the_content', $icerik ); // phpcs:ignore WordPress.Security.EscapeOutput -- WordPress sayfa içeriği.
 }
+kyrox_bilgi_baglantilari();
 wp_footer();
 ?>
 </body></html>
