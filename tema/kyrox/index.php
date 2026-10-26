@@ -6,7 +6,7 @@
 defined( 'ABSPATH' ) || exit;
 get_header();
 ?>
-<main id="bas" class="blog">
+<main id="bas" tabindex="-1" class="blog">
 <section class="wrap blog-head">
 <span class="eyebrow">Blog</span>
 <h1><?php echo esc_html( wp_strip_all_tags( get_the_archive_title() ) ); ?></h1>

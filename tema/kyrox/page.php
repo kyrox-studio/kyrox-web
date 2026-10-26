@@ -9,7 +9,7 @@ get_header();
 while ( have_posts() ) :
 	the_post();
 	?>
-<main id="bas" class="blog">
+<main id="bas" tabindex="-1" class="blog">
 <article class="wrap post">
 <header class="post-head">
 <h1><?php the_title(); ?></h1>
