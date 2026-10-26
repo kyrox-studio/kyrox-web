@@ -6,7 +6,7 @@
 defined( 'ABSPATH' ) || exit;
 get_header();
 ?>
-<main id="bas" class="blog">
+<main id="bas" tabindex="-1" class="blog">
 <section class="wrap blog-head">
 <span class="eyebrow">Blog</span>
 <h1>Atölyeden<br><em>notlar.</em></h1>

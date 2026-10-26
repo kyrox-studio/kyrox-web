@@ -10,7 +10,7 @@ while ( have_posts() ) :
 	the_post();
 	$etiketler = get_the_tags() ?: array();
 	?>
-<main id="bas" class="blog">
+<main id="bas" tabindex="-1" class="blog">
 <article class="wrap post">
 <header class="post-head">
 <a class="back" href="<?php echo esc_url( kyrox_blog_adresi() ); ?>">← Blog</a>

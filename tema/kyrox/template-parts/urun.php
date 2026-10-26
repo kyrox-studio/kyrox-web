@@ -12,7 +12,7 @@ while ( have_posts() ) :
 		}
 	}
 	?>
-<main id="bas" class="product-page wrap">
+<main id="bas" tabindex="-1" class="product-page wrap">
   <header class="product-hero">
     <a class="all" href="<?php echo esc_url( home_url( '/#projeler' ) ); ?>">← Tüm projeler</a>
     <?php if ( $urun ) : ?><span class="eyebrow"><?php echo esc_html( $urun['etiket'] ); ?></span><?php endif; ?>
