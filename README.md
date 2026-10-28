@@ -70,7 +70,7 @@ Tema klasörü kapsayıcıya salt okunur bağlanır; temada yaptığınız deği
 
 Statik tasarımı önizlemek için: `node tasarim/serve.mjs` → `http://localhost:4321`.
 
-Stand V3 görüntüleyicisinin kaynağı `tasarim/stand-v3/viewer.js`, dağıtım dosyası `tema/kyrox/assets/stand-v3/viewer.js` içindedir. Yeniden derleme: `node tasarim/stand-v3/build-viewer.mjs`; kurulu Fair Stand bağımlılıkları kullanılır, farklı konum için `FAIR_STAND_ROOT` verilir. Sunucuya Node veya proje kataloğu gerekmez. Model kaynakları ve lisanslar tanıtım sayfasındaki bağlantıda tutulur. Ham proje/katalog dışa aktarımı ve erişim bilgileri dağıtım paketine konmaz.
+Stand V3 görüntüleyicisinin kaynağı `tasarim/stand-v3/viewer.js`, dağıtım dosyası `tema/kyrox/assets/stand-v3/viewer.js` içindedir. Yeniden derleme: `node tasarim/scripts/build-viewer.mjs`; kurulu Fair Stand bağımlılıkları kullanılır, farklı konum için `FAIR_STAND_ROOT` verilir. Sunucuya Node veya proje kataloğu gerekmez. Model kaynakları ve lisanslar tanıtım sayfasındaki bağlantıda tutulur. Ham proje/katalog dışa aktarımı ve erişim bilgileri dağıtım paketine konmaz.
 
 ## Kontroller
 
