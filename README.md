@@ -18,21 +18,24 @@ Karar kaydı: [ADR-0011](https://github.com/kyrox-studio/kyrox-platform/blob/mai
 - **Yazılar:** blog. Yazılar `/blog/yazi-adi/` adresinde. Özet alanı Google ve paylaşım önizlemesinde kullanılır; etiketler yazının üstünde görünür.
 - **İşler** (sol menü): ana sayfadaki iş kartları. Her kartta tür, durum (Kullanımda / Tezgâhta), link ve teknik çizim seçimi var; sırayı "Sıra" alanı belirler.
 - **Sayfalar > Fuar CRM:** `/fuar-crm/` ürün tanıtımının başlığı, özeti ve içeriği. Tema güncellemesinden sonra yönetici paneli ilk açıldığında eksik başlangıç sayfası eklenir; mevcut sayfa içeriği değiştirilmez. Uygulama giriş adresi ürün tanımından gelir.
-- **Sayfalar > Stand Konfiguratör:** `/fuar-stand/` V3 tanıtımı. Elikon'un gerçek 9 × 5 m projesinden üretilen sahne otomatik açılır; sürümlü model tarayıcı önbelleğinde saklanır. İlk indirmede kapak korunur, sonraki açılışta önbellek kullanılır; depolama kullanılamazsa normal indirmeye dönülür. Ziyaretçi döndürür/yakınlaştırır; editör, oturum bilgileri, müşteri verisi veya kayıt API'si tanıtıma taşınmaz. Eski V1/V2 kaynakları korunmuştur. Ürün sayfalarını paneli açmadan kurmak için: `wp eval 'kyrox_urun_sayfalarini_kur();'` (yönetici kullanıcıyla).
+- **Sayfalar > Stand Konfiguratör:** `/fuar-stand/` V3 tanıtımı. Elikon'un gerçek 9 × 5 m projesinden üretilen sahne otomatik açılır; model yüklenene kadar kapak görseli görünür. Model yalnız ziyaretçi "Depolama tercihleri"nden izin verirse tarayıcı önbelleğinde saklanır (tercih 180 gün hatırlanır); izin yoksa veya depolama kullanılamazsa saklanmadan indirilir. Ziyaretçi döndürür/yakınlaştırır; editör, oturum bilgileri, müşteri verisi veya kayıt API'si tanıtıma taşınmaz. Ürün sayfalarını paneli açmadan kurmak için: `wp eval 'kyrox_urun_sayfalarini_kur();'` (yönetici kullanıcıyla).
 - **Görünüm > Özelleştir > Kyrox Studio:**
   - koyu / krem görünüm
   - açılış, giriş, atölye kartları, işler, blog ve iş fişi bölümlerinin metinleri
   - iletişim bilgileri (e-posta, WhatsApp, adres)
   - Sık sorulan sorular bölümünün başlığı ve altı soru-cevabı
+  - takip bandı (sosyal medya) metinleri
   - Google ve yapay zekâ için başlık, açıklama ve kurum tanıtımı
 
 Varsayılan metinler onaylı tasarımdakilerdir; bir alan boş bırakılırsa varsayılana döner.
+
+- **Sayfalar > gizlilik, kullanim-kosullari, cerezler:** bu adreslerdeki sayfalar yayımlanmış ve şifresizse alt bilgide bağlantıları ve "Depolama tercihleri" düğmesi görünür.
 
 ## Arama motorları ve yapay zekâ
 
 Tema şunları kendisi üretir:
 - her sayfada açıklama, canonical ve Open Graph etiketleri
-- JSON-LD: `LocalBusiness`, `WebSite`; yazılarda ayrıca `BlogPosting` ve `BreadcrumbList`
+- JSON-LD: her sayfada `LocalBusiness`, `WebSite`; blog sayfasında `Blog`; yazılarda `BlogPosting` ve `BreadcrumbList`; ürün sayfalarında `WebPage` ve `BreadcrumbList`
 - `robots.txt`: yapay zekâ tarayıcıları açıkça davetli
 - `/llms.txt`: kurum, hizmetler, ürünler ve yazıların özeti
 - ana sayfadaki SSS metinleriyle aynı içerikten üretilen `FAQPage` bilgisi; SSS ayrıca `/llms.txt` içinde yer alır
@@ -59,12 +62,13 @@ docker compose run --rm cli wp theme activate kyrox
 ```
 
 Tema ilk etkinleştiğinde:
-- Ana sayfa ve Blog sayfalarını oluşturur.
+- Ana sayfa, Blog, Fuar CRM ve Stand Konfiguratör sayfalarını oluşturur.
 - Kalıcı bağlantıları `/blog/%postname%/` yapar.
-- Saat dilimini İstanbul yapar, yorumları kapatır.
+- Saat dilimini İstanbul yapar; yorumları, geri bildirimleri ve ziyaretçi kaydını kapatır.
+- "Uncategorized" kategorisini "Atölye notları" yapar; WordPress'in örnek yazı ve sayfası hiç düzenlenmemişse siler.
 - Örnek yazıyı ve dört iş kartını ekler.
 
-Bunlar bir kez yapılır; var olan içeriğe dokunulmaz.
+Bunlar bir kez yapılır; var olan içeriğe dokunulmaz. Elle tekrar çalıştırmak: `wp eval 'kyrox_kur();'`.
 
 Tema klasörü kapsayıcıya salt okunur bağlanır; temada yaptığınız değişiklik sayfayı yenileyince görünür.
 
@@ -77,6 +81,8 @@ Stand V3 görüntüleyicisinin kaynağı `tasarim/stand-v3/viewer.js`, dağıtı
 CI her PR'da:
 - temadaki PHP dosyalarını PHP 8.4 ile denetler (`tema/lint.sh`),
 - Docker Compose dosyasını doğrular,
+- `sunucu/kur.sh`'yi shellcheck ile denetler,
+- nginx site ayarını `nginx -t` ile sınar,
 - statik tasarımı derleyip kontrol eder.
 
 Yerelde PHP denetimi için:
