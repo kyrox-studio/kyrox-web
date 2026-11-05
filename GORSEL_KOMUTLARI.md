@@ -23,7 +23,7 @@ Midjourney kullanıyorsanız sona ayrıca şunu ekleyin: `--style raw --ar 16:9`
 
 ## 1. Açılış, CRAFT tarafı
 
-Sitede: açılıştaki sürüklenen ekranın sağ yarısı. Oran 16:9, en az 1920 × 1080.
+Sitede: açılıştaki sürüklenen ekranın sağ yarısı (şu an CSS ile çizilen ahşap desen; görsel alanı tema değişikliğiyle eklenir). Oran 16:9, en az 1920 × 1080.
 
 ```
 close-up of a workbench edge with a freshly planed walnut board, curled wood shavings, a steel try square resting on the wood, light falling from the right side, [STİL EKİ]
@@ -37,7 +37,7 @@ macro of hands-free woodworking scene, oak plank with visible grain on a dark wo
 
 ## 2. Atölyeden genel kare
 
-Sitede: ileride eklenecek "Atölyeden" şeridi. Oran 4:3.
+Sitede: temada karşılığı olan bölüm yok. Oran 4:3.
 
 ```
 small modern craft studio at dusk, a 3D printer and a compact CNC router softly out of focus in the background, wooden workbench in the foreground with tools neatly arranged, single warm lamp, [STİL EKİ]
@@ -45,7 +45,7 @@ small modern craft studio at dusk, a 3D printer and a compact CNC router softly 
 
 ## 3. 3D yazıcı
 
-Sitede: "Atölyede neler var?" bölümündeki 3D baskı kutusu. Oran 4:3.
+Sitede: "Atölyede neler var?" bölümündeki 3D Baskı kutusu (şu an ikon; görsel alanı tema değişikliğiyle eklenir). Oran 4:3.
 
 ```
 macro shot of an FDM 3D printer nozzle laying a copper-colored filament layer, visible layer lines on a partially printed thick letter shape, dark enclosure, [STİL EKİ]
@@ -53,7 +53,7 @@ macro shot of an FDM 3D printer nozzle laying a copper-colored filament layer, v
 
 ## 4. CNC
 
-Sitede: CNC & Ahşap kutusu. Oran 4:3.
+Sitede: aynı bölümdeki CNC & Ahşap kutusu (şu an ikon). Oran 4:3.
 
 ```
 CNC router bit cutting a curved line into a plywood sheet, fine dust in the air, motion frozen, steel gantry partly visible, [STİL EKİ]
@@ -61,7 +61,7 @@ CNC router bit cutting a curved line into a plywood sheet, fine dust in the air,
 
 ## 5. Yazılım
 
-Sitede: Yazılım kutusu. Oran 4:3.
+Sitede: aynı bölümdeki Yazılım kutusu (şu an ikon). Oran 4:3.
 
 ```
 laptop on a wooden workbench showing an abstract dark dashboard with copper accents, blurred wood shavings and a caliper next to it, the screen content is abstract shapes only, [STİL EKİ]
@@ -69,7 +69,7 @@ laptop on a wooden workbench showing an abstract dark dashboard with copper acce
 
 ## 6. Blog kapakları
 
-Oran 1200 × 630 (yatay). Yazının konusuna göre baştaki nesneyi değiştirin.
+Sitede: yazının "Öne çıkan görsel" alanı; yazı sayfasının üstünde ve arama motoru bilgisinde (`BlogPosting`) kullanılır. Oran 1200 × 630 (yatay). Yazının konusuna göre baştaki nesneyi değiştirin.
 
 ```
 flat lay on dark charcoal surface: [KONU NESNESİ], arranged with generous empty space on the left, [STİL EKİ]
@@ -85,5 +85,5 @@ flat lay on dark charcoal surface: [KONU NESNESİ], arranged with generous empty
 
 1. Görseli JPG olarak, en fazla 2000 px genişlikte kaydedin. Boyut 300 KB'ı geçmesin; geçerse squoosh.app gibi bir araçla sıkıştırın.
 2. Dosya adı Türkçe karakter ve boşluk içermesin: `craft-ceviz-tezgah.jpg`
-3. Atmosfer görselleri `public/gorsel/`, blog görselleri `public/blog-gorsel/` klasörüne gider.
-4. Hangi görselin nereye gideceğini Claude'a söyleyin, yerleştirsin.
+3. Blog kapağı WordPress panelinde yazının "Öne çıkan görsel" alanına yüklenir.
+4. Atmosfer görselleri için temada görsel alanı yok; hangi görselin nereye gideceğini Claude'a söyleyin, temaya alan eklesin.
