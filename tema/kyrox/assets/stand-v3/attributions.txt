@@ -1,4 +1,4 @@
-Elikon tanıtım sahnesi: modeller proje yerleşimine göre ölçeklendi ve birleştirilmiş sahne dosyası Meshopt/WebP ile sıkıştırıldı. Kaynak modellerin lisansları korunur.
+Elikon ve 3DM + SİMES tanıtım sahneleri: modeller proje yerleşimine göre ölçeklendi ve birleştirilmiş sahne dosyaları Meshopt/WebP ile sıkıştırıldı. Kaynak modellerin lisansları korunur.
 
 Bar Taburesi model attribution
 
