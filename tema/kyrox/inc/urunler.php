@@ -87,7 +87,9 @@ function kyrox_stand_v4_icerigi( string $icerik ): string {
 		'data-showcase data-state="idle"><div class="hud"><span><b>●</b> GERÇEK PROJE / ELIKON</span><span>9 × 5 METRE</span>'
 			=> 'data-showcase data-showcase-project="simes-ada" data-state="idle"><div class="hud"><span><b>●</b> GERÇEK PROJE / 3DM + SİMES</span><span>12 × 9 METRE</span>',
 		'{{STAND_ASSETS}}/elikon-cover.webp" alt="Elikon\'un 9 × 5 metrelik kayıtlı stand tasarımı'
-			=> '{{STAND_ASSETS}}/simes-ada-cover.webp" alt="3DM + SİMES için tasarlanan 12 × 9 metrelik ada standı',
+			=> '{{STAND_ASSETS}}/simes-ada-cover.webp?v=2" alt="3DM + SİMES için tasarlanan 12 × 9 metrelik ada standı',
+		'width="1440" height="900" fetchpriority="high"'
+			=> 'width="1440" height="1050" fetchpriority="high"',
 		'aria-label="Elikon standını üç boyutlu inceleyin"'
 			=> 'aria-label="3DM + SİMES ada standını üç boyutlu inceleyin"',
 		'Gösterilen 9 × 5 metrelik stand, Fair Stand uygulamasında kayıtlı Elikon projesinden'

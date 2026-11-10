@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 /** Yalnız kamera: dışa aktarılmış gerçek sahnede düzenleme veya API bağlantısı yoktur. */
-export async function createViewer({ container, url, signal, onProgress = () => {} }) {
+export async function createViewer({ container, url, signal, onProgress = () => {}, projectLabel = 'Elikon', cornerView = false }) {
   const renderer = new THREE.WebGLRenderer({antialias:true,alpha:false});
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
   renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -45,11 +45,28 @@ export async function createViewer({ container, url, signal, onProgress = () => 
     if(cacheCopy&&cacheAllowed()){try{await modelCache.put(url,cacheCopy);if(!cacheAllowed())await globalThis.caches?.delete('kyrox-stand-scenes-v1');else{const current=new URL(url);for(const key of await modelCache.keys()){const old=new URL(key.url);if(old.pathname===current.pathname&&old.href!==current.href)await modelCache.delete(key);}}}catch{/* Önbellek kotası doluysa sahne çalışmaya devam eder. */}}
     const box=new THREE.Box3().setFromObject(root),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
     const radius=Math.max(size.x,size.z,size.y)*0.9;
-    const target=new THREE.Vector3(center.x,Math.max(1.35,size.y*0.43),center.z);
-    function home(){const halfFov=THREE.MathUtils.degToRad(camera.fov/2);const distance=(Math.max(size.x/(2*Math.tan(halfFov)*camera.aspect),size.y/(2*Math.tan(halfFov)),size.z)+size.z*0.55)*1.25;controls.target.copy(target);camera.position.copy(target).add(new THREE.Vector3(-0.14,0.55,1).normalize().multiplyScalar(distance));camera.lookAt(target);controls.update();schedule();}
+    const target=new THREE.Vector3(center.x,Math.max(1.35,size.y*0.43)-(cornerView?.45:0),center.z);
+    const direction=new THREE.Vector3(...(cornerView?[0.64,0.63,1]:[-0.14,0.55,1])).normalize();
+    const right=new THREE.Vector3().crossVectors(camera.up,direction).normalize();
+    const up=new THREE.Vector3().crossVectors(direction,right);
+    function home(){
+      const tanV=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+      const tanH=tanV*camera.aspect;
+      let distance=(Math.max(size.x/(2*tanH),size.y/(2*tanV),size.z)+size.z*0.55)*1.25;
+      if(cornerView){
+        // Kadrajı döndürülmüş standın sınırlarına göre sığdır; dar ekranda kenarlar kesilmesin.
+        distance=0;
+        for(const x of [box.min.x,box.max.x]) for(const y of [box.min.y,box.max.y]) for(const z of [box.min.z,box.max.z]){
+          const point=new THREE.Vector3(x,y,z).sub(target);
+          const span=Math.max(Math.abs(point.dot(right))/(tanH*.93),Math.abs(point.dot(up))/(tanV*.85));
+          distance=Math.max(distance,point.dot(direction)+span);
+        }
+      }
+      controls.target.copy(target);camera.position.copy(target).addScaledVector(direction,distance);camera.lookAt(target);controls.update();schedule();
+    }
     controls.minDistance=Math.max(2,size.y);controls.maxDistance=radius*3.3;
     container.appendChild(renderer.domElement);renderer.domElement.tabIndex=0;
-    renderer.domElement.setAttribute('aria-label','Elikon standının gerçek 3D sahnesi. Ok tuşlarıyla döndürün, artı ve eksiyle yakınlaştırın, Home ile başlangıca dönün.');
+    renderer.domElement.setAttribute('aria-label',`${projectLabel} standının gerçek 3D sahnesi. Ok tuşlarıyla döndürün, artı ve eksiyle yakınlaştırın, Home ile başlangıca dönün.`);
     const orbit=direction=>{const spherical=new THREE.Spherical().setFromVector3(camera.position.clone().sub(controls.target));spherical.theta+=direction*Math.PI/12;camera.position.copy(controls.target).add(new THREE.Vector3().setFromSpherical(spherical));controls.update();schedule();};
     const zoom=direction=>{const offset=camera.position.clone().sub(controls.target);offset.multiplyScalar(direction>0?0.85:1.18);offset.setLength(THREE.MathUtils.clamp(offset.length(),controls.minDistance,controls.maxDistance));camera.position.copy(controls.target).add(offset);controls.update();schedule();};
     renderer.domElement.addEventListener('keydown',event=>{if(event.key==='ArrowLeft'){orbit(-1);}else if(event.key==='ArrowRight'){orbit(1);}else if(event.key==='+'||event.key==='='){zoom(1);}else if(event.key==='-'){zoom(-1);}else if(event.key==='Home'){home();}else return;event.preventDefault();});

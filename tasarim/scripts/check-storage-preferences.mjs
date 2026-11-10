@@ -26,7 +26,7 @@ const ready=p=>p.waitForSelector('[data-showcase][data-state="ready"]',{timeout:
 const cacheKeys=p=>p.evaluate(()=>caches.keys());
 try{
  const context=await browser.newContext();const p=await context.newPage();const errors=[];const initial=[];p.on('pageerror',e=>errors.push(e.message));p.on('request',r=>initial.push(r.url()));
- await p.goto(base);assert(!initial.some(url=>/viewer\.js|simes-ada\.glb/.test(url)));await start(p);await ready(p);assert.equal((await cacheKeys(p)).includes(cache),false);assert(await p.locator('[data-storage-prompt]').isVisible());
+ await p.goto(base);await p.locator('[data-showcase-canvas] canvas').waitFor({state:'attached',timeout:45000});assert(await p.locator('[data-showcase-cover]').isVisible());assert(await p.locator('[data-showcase-canvas]').evaluate(el=>el.inert));await start(p);await ready(p);assert.equal(initial.filter(url=>url.includes('/simes-ada.glb')).length,1);assert.equal((await cacheKeys(p)).includes(cache),false);assert(await p.locator('[data-storage-prompt]').isVisible());
  await p.locator('[data-storage-allow]').click();await p.reload();await start(p);await ready(p);assert((await cacheKeys(p)).includes(cache));
  let requests=0;await context.route('**/simes-ada.glb*',route=>{requests++;return route.abort();});await p.reload();await start(p);await ready(p);assert.equal(requests,0);await context.unroute('**/simes-ada.glb*');
  await p.evaluate(async()=>{const c=await caches.open('unrelated-cache');await c.put('/sentinel',new Response('keep'));});
@@ -42,7 +42,7 @@ try{
  const blocked=await browser.newContext();await blocked.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw Error('blocked');}});Object.defineProperty(window,'caches',{value:undefined});});const b=await blocked.newPage();await b.goto(base);await start(b);await ready(b);await b.locator('[data-storage-deny]').click();assert.match(await b.locator('[data-storage-status]').textContent(),/yalnız bu sayfa/);await blocked.close();
  const race=await browser.newContext();await race.addInitScript(k=>localStorage.setItem(k,JSON.stringify({version:1,modelCache:true,expires:Date.now()+60000})),key);
  let release,requested;const hold=new Promise(r=>release=r);const requestSeen=new Promise(r=>requested=r);
- await race.route('**/simes-ada.glb*',async route=>{requested();await hold;await route.continue();});const rp=await race.newPage();await rp.goto(base);await start(rp);await requestSeen;
+ await race.route('**/simes-ada.glb*',async route=>{requested();await hold;await route.continue();});const rp=await race.newPage();await rp.goto(base);await requestSeen;await start(rp);
  await rp.locator('button[data-storage-open]').first().click();await rp.locator('[data-storage-model]').uncheck();await rp.locator('[data-storage-save]').click();release();await ready(rp);assert.equal((await cacheKeys(rp)).includes(cache),false);await race.close();
- assert.deepEqual(errors,[]);console.log('PASS: default deny, on-demand scene, allow/cache hit, revoke including in-flight load, unrelated cache preservation, expiry, cross-tab, blocked storage, mobile and Escape.');
+ assert.deepEqual(errors,[]);console.log('PASS: default deny, background preparation and single-request reveal, allow/cache hit, revoke including in-flight load, unrelated cache preservation, expiry, cross-tab, blocked storage, mobile and Escape.');
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
