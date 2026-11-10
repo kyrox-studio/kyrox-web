@@ -31,6 +31,11 @@
     })().finally(()=>{if(controller===attempt){pending=null;controller=null;}});
     return pending;
   }
+  function display(focus=false){
+    host.inert=false;cover.hidden=true;trigger.hidden=true;toolbar.hidden=false;shell.dataset.state='ready';
+    status.textContent=`Gerçek ${project} projesi · Döndürmek için sürükleyin, yakınlaştırmak için kaydırın veya iki parmağınızı kullanın.`;
+    if(focus)host.querySelector('canvas')?.focus({preventScroll:true});
+  }
   async function reveal({focus=true}={}){
     if(opening||shell.dataset.state==='ready')return;
     opening=true;trigger.disabled=true;trigger.textContent='Sahne yükleniyor…';shell.dataset.state='loading';
@@ -39,9 +44,7 @@
     try{
       const result=await job;
       if(!active||viewer!==result)return;
-      host.inert=false;cover.hidden=true;trigger.hidden=true;toolbar.hidden=false;shell.dataset.state='ready';
-      status.textContent=`Gerçek ${project} projesi · Döndürmek için sürükleyin, yakınlaştırmak için kaydırın veya iki parmağınızı kullanın.`;
-      if(focus)host.querySelector('canvas')?.focus({preventScroll:true});
+      display(focus);
     }catch(error){
       if(!active||error.name==='AbortError')return;
       shell.dataset.state='error';trigger.disabled=false;trigger.textContent='Tekrar dene';
@@ -51,7 +54,12 @@
   function warm(){
     const connection=navigator.connection;
     if(connection?.saveData||/^(slow-)?2g$/.test(connection?.effectiveType??''))return;
-    const run=()=>{if(active&&!document.hidden&&shell.dataset.state==='idle')void prepare().catch(()=>{});};
+    const run=()=>{
+      if(!active||document.hidden||shell.dataset.state!=='idle')return;
+      void prepare().then(result=>{
+        if(active&&viewer===result&&shell.dataset.state==='idle')display(document.activeElement===trigger);
+      }).catch(()=>{});
+    };
     if('requestIdleCallback' in window)window.requestIdleCallback(run,{timeout:1200});else window.setTimeout(run,250);
   }
   trigger.addEventListener('click',()=>void reveal());
