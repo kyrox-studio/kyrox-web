@@ -10,10 +10,12 @@
   const trigger=shell.querySelector('[data-load-3d]'),status=shell.querySelector('[data-showcase-status]'),host=shell.querySelector('[data-showcase-canvas]'),cover=shell.querySelector('[data-showcase-cover]'),toolbar=shell.querySelector('[data-showcase-toolbar]');
   const script=document.currentScript;const base=new URL('.',script.src);
   const viewerUrl=new URL('viewer.js',base);viewerUrl.searchParams.set('v',new URL(script.src).searchParams.get('ver')||'1.3.1');
-  const modelUrl=new URL('elikon.glb',base);modelUrl.searchParams.set('v','730f0a9111277729');
+  const ada=shell.dataset.showcaseProject==='simes-ada';
+  const modelUrl=new URL(ada?'simes-ada.glb':'elikon.glb',base);modelUrl.searchParams.set('v',ada?'5f3fbde69d4df62b':'730f0a9111277729');
+  const project=ada?'3DM + SİMES':'Elikon';
   let viewer=null,loading=false,controller=null;
-  async function load({focus=false}={}){if(loading||viewer)return;loading=true;cover.hidden=false;toolbar.hidden=true;trigger.hidden=false;trigger.disabled=true;trigger.textContent='Sahne yükleniyor…';status.textContent='Elikon projesi hazırlanıyor. Birazdan standı kendiniz döndürebileceksiniz.';shell.dataset.state='loading';controller=new AbortController();
-    try{const {createViewer}=await import(viewerUrl.href);viewer=await createViewer({container:host,url:modelUrl.href,signal:controller.signal,onProgress:percent=>{status.textContent=percent==null?'3D sahne hazırlanıyor…':`3D sahne hazırlanıyor: %${percent}`;}});cover.hidden=true;trigger.hidden=true;toolbar.hidden=false;shell.dataset.state='ready';status.textContent='Gerçek Elikon projesi · Döndürmek için sürükleyin, yakınlaştırmak için kaydırın veya iki parmağınızı kullanın.';if(focus)host.querySelector('canvas')?.focus({preventScroll:true});}
+  async function load({focus=false}={}){if(loading||viewer)return;loading=true;cover.hidden=false;toolbar.hidden=true;trigger.hidden=false;trigger.disabled=true;trigger.textContent='Sahne yükleniyor…';status.textContent=`${project} projesi hazırlanıyor. Birazdan standı kendiniz döndürebileceksiniz.`;shell.dataset.state='loading';controller=new AbortController();
+    try{const {createViewer}=await import(viewerUrl.href);viewer=await createViewer({container:host,url:modelUrl.href,signal:controller.signal,onProgress:percent=>{status.textContent=percent==null?'3D sahne hazırlanıyor…':`3D sahne hazırlanıyor: %${percent}`;}});cover.hidden=true;trigger.hidden=true;toolbar.hidden=false;shell.dataset.state='ready';status.textContent=`Gerçek ${project} projesi · Döndürmek için sürükleyin, yakınlaştırmak için kaydırın veya iki parmağınızı kullanın.`;if(focus)host.querySelector('canvas')?.focus({preventScroll:true});}
     catch(error){viewer?.dispose();viewer=null;shell.dataset.state='error';trigger.disabled=false;trigger.textContent='Tekrar dene';status.textContent='3D sahne açılamadı. Proje görselini inceleyebilir veya yeniden deneyebilirsiniz.';}
     finally{loading=false;}
   }
@@ -24,6 +26,5 @@
   toolbar.querySelector('[data-view-in]').addEventListener('click',()=>viewer?.zoom(1));
   toolbar.querySelector('[data-view-out]').addEventListener('click',()=>viewer?.zoom(-1));
   addEventListener('pagehide',()=>{controller?.abort();viewer?.dispose();});
-  addEventListener('pageshow',event=>{if(event.persisted){viewer=null;loading=false;void load();}});
-  requestAnimationFrame(()=>{void load();});
+  addEventListener('pageshow',event=>{if(event.persisted&&shell.dataset.state!=='idle'){viewer=null;loading=false;void load();}});
 })();

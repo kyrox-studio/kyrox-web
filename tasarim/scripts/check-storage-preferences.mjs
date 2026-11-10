@@ -18,30 +18,31 @@ const server=createServer(async(req,res)=>{
  try{res.setHeader('content-type',({'.js':'text/javascript','.css':'text/css','.woff2':'font/woff2','.svg':'image/svg+xml','.webp':'image/webp','.glb':'model/gltf-binary'})[extname(file)]||'text/plain');res.end(await readFile(file));}catch{res.writeHead(404).end();}
 });
 await new Promise(resolve=>server.listen(4394,'127.0.0.1',resolve));
-const browser=await chromium.launch();
+const browser=await chromium.launch({args:['--enable-unsafe-swiftshader']});
 const base='http://127.0.0.1:4394/';
 const key='kyrox.storage-preference.v1', cache='kyrox-stand-scenes-v1';
+const start=async p=>{assert.equal(await p.locator('[data-showcase]').getAttribute('data-state'),'idle');await p.locator('[data-load-3d]').click();};
 const ready=p=>p.waitForSelector('[data-showcase][data-state="ready"]',{timeout:45000});
 const cacheKeys=p=>p.evaluate(()=>caches.keys());
 try{
- const context=await browser.newContext();const p=await context.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));
- await p.goto(base);await ready(p);assert.equal((await cacheKeys(p)).includes(cache),false);assert(await p.locator('[data-storage-prompt]').isVisible());
- await p.locator('[data-storage-allow]').click();await p.reload();await ready(p);assert((await cacheKeys(p)).includes(cache));
- let requests=0;await context.route('**/elikon.glb*',route=>{requests++;return route.abort();});await p.reload();await ready(p);assert.equal(requests,0);await context.unroute('**/elikon.glb*');
+ const context=await browser.newContext();const p=await context.newPage();const errors=[];const initial=[];p.on('pageerror',e=>errors.push(e.message));p.on('request',r=>initial.push(r.url()));
+ await p.goto(base);assert(!initial.some(url=>/viewer\.js|simes-ada\.glb/.test(url)));await start(p);await ready(p);assert.equal((await cacheKeys(p)).includes(cache),false);assert(await p.locator('[data-storage-prompt]').isVisible());
+ await p.locator('[data-storage-allow]').click();await p.reload();await start(p);await ready(p);assert((await cacheKeys(p)).includes(cache));
+ let requests=0;await context.route('**/simes-ada.glb*',route=>{requests++;return route.abort();});await p.reload();await start(p);await ready(p);assert.equal(requests,0);await context.unroute('**/simes-ada.glb*');
  await p.evaluate(async()=>{const c=await caches.open('unrelated-cache');await c.put('/sentinel',new Response('keep'));});
  await p.locator('button[data-storage-open]').first().click();await p.locator('[data-storage-model]').uncheck();await p.locator('[data-storage-save]').click();
  assert.equal((await cacheKeys(p)).includes(cache),false);assert((await cacheKeys(p)).includes('unrelated-cache'));
- await p.reload();await ready(p);assert.equal((await cacheKeys(p)).includes(cache),false);assert.equal(await p.locator('[data-storage-prompt]').isVisible(),false);
+ await p.reload();await start(p);await ready(p);assert.equal((await cacheKeys(p)).includes(cache),false);assert.equal(await p.locator('[data-storage-prompt]').isVisible(),false);
  await p.locator('button[data-storage-open]').first().click();await p.keyboard.press('Escape');assert.equal(await p.locator('dialog').isVisible(),false);
- await p.evaluate(k=>localStorage.setItem(k,JSON.stringify({version:1,modelCache:true,expires:1})),key);await p.reload();await ready(p);assert.equal((await cacheKeys(p)).includes(cache),false);assert(await p.locator('[data-storage-prompt]').isVisible());
+ await p.evaluate(k=>localStorage.setItem(k,JSON.stringify({version:1,modelCache:true,expires:1})),key);await p.reload();await start(p);await ready(p);assert.equal((await cacheKeys(p)).includes(cache),false);assert(await p.locator('[data-storage-prompt]').isVisible());
  await p.setViewportSize({width:390,height:844});assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));if(process.env.WEB_PREFERENCE_EVIDENCE){await mkdir(process.env.WEB_PREFERENCE_EVIDENCE,{recursive:true});await p.screenshot({path:resolve(process.env.WEB_PREFERENCE_EVIDENCE,'preference-mobile.png'),fullPage:false});}
- await p.locator('[data-storage-deny]').click();const second=await context.newPage();await second.goto(base);await ready(second);
- await second.locator('button[data-storage-open]').first().click();await second.locator('[data-storage-model]').check();await second.locator('[data-storage-save]').click();await p.reload();await ready(p);assert((await cacheKeys(p)).includes(cache));
+ await p.locator('[data-storage-deny]').click();const second=await context.newPage();await second.goto(base);await start(second);await ready(second);
+ await second.locator('button[data-storage-open]').first().click();await second.locator('[data-storage-model]').check();await second.locator('[data-storage-save]').click();await p.reload();await start(p);await ready(p);assert((await cacheKeys(p)).includes(cache));
  await second.locator('button[data-storage-open]').first().click();await second.locator('[data-storage-model]').uncheck();await second.locator('[data-storage-save]').click();await p.waitForFunction(()=>globalThis.kyroxSceneStorage.allowed()===false);assert.equal((await cacheKeys(p)).includes(cache),false);
- const blocked=await browser.newContext();await blocked.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw Error('blocked');}});Object.defineProperty(window,'caches',{value:undefined});});const b=await blocked.newPage();await b.goto(base);await ready(b);await b.locator('[data-storage-deny]').click();assert.match(await b.locator('[data-storage-status]').textContent(),/yalnız bu sayfa/);await blocked.close();
+ const blocked=await browser.newContext();await blocked.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw Error('blocked');}});Object.defineProperty(window,'caches',{value:undefined});});const b=await blocked.newPage();await b.goto(base);await start(b);await ready(b);await b.locator('[data-storage-deny]').click();assert.match(await b.locator('[data-storage-status]').textContent(),/yalnız bu sayfa/);await blocked.close();
  const race=await browser.newContext();await race.addInitScript(k=>localStorage.setItem(k,JSON.stringify({version:1,modelCache:true,expires:Date.now()+60000})),key);
  let release,requested;const hold=new Promise(r=>release=r);const requestSeen=new Promise(r=>requested=r);
- await race.route('**/elikon.glb*',async route=>{requested();await hold;await route.continue();});const rp=await race.newPage();await rp.goto(base);await requestSeen;
+ await race.route('**/simes-ada.glb*',async route=>{requested();await hold;await route.continue();});const rp=await race.newPage();await rp.goto(base);await start(rp);await requestSeen;
  await rp.locator('button[data-storage-open]').first().click();await rp.locator('[data-storage-model]').uncheck();await rp.locator('[data-storage-save]').click();release();await ready(rp);assert.equal((await cacheKeys(rp)).includes(cache),false);await race.close();
- assert.deepEqual(errors,[]);console.log('PASS: default deny, auto scene, allow/cache hit, revoke including in-flight load, unrelated cache preservation, expiry, cross-tab, blocked storage, mobile and Escape.');
+ assert.deepEqual(errors,[]);console.log('PASS: default deny, on-demand scene, allow/cache hit, revoke including in-flight load, unrelated cache preservation, expiry, cross-tab, blocked storage, mobile and Escape.');
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

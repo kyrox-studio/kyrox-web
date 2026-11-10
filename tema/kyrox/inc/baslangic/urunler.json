@@ -15,13 +15,13 @@
     "adres": "fuar-stand",
     "baslik": "Stand Konfiguratör",
     "etiket": "Gerçek modüllerle 3D stand tasarımı",
-    "aciklama": "Standınızı gerçek ölçülerle tasarlayın. Elikon projesini giriş yapmadan 3D döndürün; tasarım, malzeme listesi ve tanımlı fiyatlarla maliyet akışını inceleyin.",
+    "aciklama": "Standınızı gerçek ölçülerle tasarlayın. 12 × 9 metrelik ada standını giriş yapmadan 3D döndürün; tasarım, malzeme listesi ve tanımlı fiyatlarla maliyet akışını inceleyin.",
     "uygulama": "https://fuar.kyrox.studio/stand-projects",
     "dugme": "Stand tasarlamaya başla",
     "icerik": "fuar-stand.html",
     "bagimsiz": true,
     "seoBaslik": "Kyrox Studio | Stand Konfiguratör",
-    "paylasimGorseli": "stand-v3/og-image.png",
-    "paylasimAlt": "Elikon projesinin gerçek 9 × 5 metrelik 3D stand tasarımı"
+    "paylasimGorseli": "stand-v3/simes-ada-og.png",
+    "paylasimAlt": "3DM + SİMES projesinin 12 × 9 metrelik 3D ada standı"
   }
 ]

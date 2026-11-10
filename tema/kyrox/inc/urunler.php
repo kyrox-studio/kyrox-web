@@ -57,8 +57,6 @@ function kyrox_stand_demo_baglantisini_ekle(): void {
 		return;
 	}
 	$degisim = array(
-		'<a class="btn secondary" href="#kanit">Tasarımdan gerçeğe ↓</a>'
-			=> '<a class="btn secondary" href="https://fuar.kyrox.studio/stand-demo">Giriş yapmadan dene ↗</a>',
 		'<a href="https://fuar.kyrox.studio/stand-projects" class="btn secondary">Platformu incele ↗</a>'
 			=> '<a href="https://fuar.kyrox.studio/stand-demo" class="btn secondary">Giriş yapmadan dene ↗</a>',
 		'<p>Hayır. Bu sayfadaki Elikon sahnesi giriş yapmadan incelenebilir. Kendi projelerinizi oluşturmak ve kaydetmek için uygulamaya giriş yapmanız gerekir.</p>'
@@ -78,6 +76,26 @@ add_action( 'init', function () {
 		update_option( 'kyrox_stand_demo_baglantisi', 1 );
 	}
 } );
+
+/** Eski başlangıç içeriğini V4 olarak göster; paneldeki sayfa kaydını değiştirme. */
+function kyrox_stand_v4_icerigi( string $icerik ): string {
+	$degisim = array(
+		'href="https://fuar.kyrox.studio/stand-projects">Stand tasarla'
+			=> 'href="https://fuar.kyrox.studio/stand-demo">Stand tasarla',
+		'<a class="btn secondary" href="https://fuar.kyrox.studio/stand-demo">Giriş yapmadan dene ↗</a>'
+			=> '<a class="btn secondary" href="#kanit">Tasarımdan gerçeğe ↓</a>',
+		'data-showcase data-state="idle"><div class="hud"><span><b>●</b> GERÇEK PROJE / ELIKON</span><span>9 × 5 METRE</span>'
+			=> 'data-showcase data-showcase-project="simes-ada" data-state="idle"><div class="hud"><span><b>●</b> GERÇEK PROJE / 3DM + SİMES</span><span>12 × 9 METRE</span>',
+		'{{STAND_ASSETS}}/elikon-cover.webp" alt="Elikon\'un 9 × 5 metrelik kayıtlı stand tasarımı'
+			=> '{{STAND_ASSETS}}/simes-ada-cover.webp" alt="3DM + SİMES için tasarlanan 12 × 9 metrelik ada standı',
+		'aria-label="Elikon standını üç boyutlu inceleyin"'
+			=> 'aria-label="3DM + SİMES ada standını üç boyutlu inceleyin"',
+		'Gösterilen 9 × 5 metrelik stand, Fair Stand uygulamasında kayıtlı Elikon projesinden'
+			=> 'Gösterilen 12 × 9 metrelik ada standı, Fair Stand uygulamasında kayıtlı 3DM + SİMES projesinden',
+		'Bu sayfadaki Elikon sahnesi' => 'Bu sayfadaki 3DM + SİMES sahnesi',
+	);
+	return strtr( $icerik, $degisim );
+}
 
 // Tema güncellemesinde yönetici ilk giriş yaptığında eksik ürün sayfalarını hazırla.
 add_action( 'admin_init', function () {
