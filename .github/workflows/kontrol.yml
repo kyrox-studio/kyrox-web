@@ -8,7 +8,7 @@ on:
 jobs:
   tema:
     name: WordPress teması (PHP sözdizimi)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
 
   sunucu:
     name: Sunucu kurulumu (kur.sh ve nginx şablonu)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -39,13 +39,13 @@ jobs:
 
   tasarim:
     name: Statik tasarım (derle ve kontrol et)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version-file: .nvmrc
       - name: Derle
         run: node tasarim/build.mjs
       - name: Kontrol et
