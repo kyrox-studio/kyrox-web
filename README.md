@@ -72,6 +72,8 @@ Bunlar bir kez yapılır; var olan içeriğe dokunulmaz. Elle tekrar çalıştı
 
 Tema klasörü kapsayıcıya salt okunur bağlanır; temada yaptığınız değişiklik sayfayı yenileyince görünür.
 
+Sürümler canlı sunucuyla aynıdır (kullanıcı kararı 2026-11-13; kyrox-platform `standards/development/ORTAM_SURUMLERI.md`): Node `.nvmrc` (22.23.3), imajlar `sunucu/docker-compose.yml` içinde ara sürüme kadar sabit (WordPress 7.1.4 / PHP 8.4, MariaDB 11.8.9, WP-CLI 2.12.0).
+
 Statik tasarımı önizlemek için: `node tasarim/serve.mjs` → `http://localhost:4321`.
 
 Stand V3 görüntüleyicisinin kaynağı `tasarim/stand-v3/viewer.js`, dağıtım dosyası `tema/kyrox/assets/stand-v3/viewer.js` içindedir. Yeniden derleme: `node tasarim/scripts/build-viewer.mjs`; kurulu Fair Stand bağımlılıkları kullanılır, farklı konum için `FAIR_STAND_ROOT` verilir. Sunucuya Node veya proje kataloğu gerekmez. Model kaynakları ve lisanslar tanıtım sayfasındaki bağlantıda tutulur. Ham proje/katalog dışa aktarımı ve erişim bilgileri dağıtım paketine konmaz.
